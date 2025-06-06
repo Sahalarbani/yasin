@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Surah Online</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #6300db, #696ecb);      
+      color: #e1e3fe ;
+      scroll-behavior: smooth;
+      transition: background 0.3s ease;
+      margin-left: 0;
+      overflow-x: hidden;
+    }
+    body.dark-mode {
+      background: #1a1a1a;
+      color: white;
+    }
+    /* Navbar */
+    .navbar-custom {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 10px 20px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+    .navbar-toggler {
+      color: white;
+      font-size: 1.5rem;
+    }
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top:39px;
+      left: -250px;
+      height: 100vh;
+      width: 250px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      overflow-y: auto;
+      transition: left 0.3s ease;
+      z-index: 999;
+    }
+    .sidebar.active {
+      left: 0;
+    }
+    .sidebar h2 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+    .sidebar button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      border-radius: 20px;
+      padding: 10px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .sidebar button.active {
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 998;
+    }
+    .overlay.active {
+      opacity: 0.5;
+      visibility: visible;
+    }
+    .container-main {
+      max-width: 800px;
+      margin: auto;
+      margin-top: 70px;
+    }
+    .card-glass {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      padding: 1rem;
+      transition: background 0.3s ease;
+    }
+    body.dark-mode .card-glass {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .arabic {
+      font-size: 34px;
+      font-family: 'Amiri', serif;
+      text-align: right;
+      line-height: 2;
+      white-space: normal;
+    }
+    .bismillah {
+      text-align: center;
+      font-family: 'Amiri', serif;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    .btn-pill {
+      border-radius: 50px;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    .btn-pill:hover {
+      opacity: 0.9;
+    }
+    .number {
+      float: left;
+      font-size: 18px;
+      font-family: 'Amiri', serif;
+      margin-right: 10px;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+    }
+    /* Tombol Toggle Dark Mode */
+    #toggleDarkMode {
+      position: fixed;
+      top: 50px;
+      right: 20px;
+      z-index: 1000;
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      transition: all 0.3s ease;
+    }
+    #toggleDarkMode:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body class="p-3">
+  <!-- Navbar -->
+  <div class="navbar-custom d-flex justify-content-between align-items-center">
+    <button id="navToggle" class="navbar-toggler p-0" title="Menu">
+      <i class="bi bi-list"></i>
+    </button>
+    <h5 class="mb-0">Mod by Sahal Arbani</h5>
+  </div>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>Pilih Surah</h2>
+      <button id="closeSidebar" class="btn btn-sm btn-danger">&times;</button>
+    </div>
+    <button class="btn btn-pill" onclick="loadSurah(36)" id="surahYasin">Yasin</button>
+    <button class="btn btn-pill" onclick="loadSurah(56)" id="surahAlWaqiah">Al-Waqiah</button>
+     <button class="btn btn-pill" onclick="loadSurah(67)" id="surahAlMulk">Al-Mulk</button>
+    <button class="btn btn-pill" onclick="loadSurah(999)" id="surahTahlil">Tahlil</button>
+    <button class="btn btn-pill" onclick="loadSurah(888)" id="surahHadroh">Hadroh</button>
+  </div>
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+  <!-- Main Content -->
+  <div class="container-main" id="mainContent">
+    <div class="text-center mt-4">
+      <h1 class="display-3">Yassin VIP</h1>
+      <div class="bismillah" id="bismillahText">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمُ</div>
+    </div>
+    <div id="verses-container" class="mt-4"></div>
+    <div class="d-flex justify-content-between mt-4">
+      <button id="prevBtn" class="btn btn-pill"><i class="bi bi-chevron-left me-1"></i> Prev</button>
+      <button id="nextBtn" class="btn btn-pill">Next <i class="bi bi-chevron-right ms-1"></i></button>
+    </div>
+  </div>
+  <!-- Tombol Toggle Mode Malam -->
+  <button id="toggleDarkMode" title="Toggle Mode Malam">
+    <i class="bi bi-moon-fill" id="iconDarkMode"></i>
+  </button>
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> 
+  <script>
+    const versesContainer = document.getElementById('verses-container');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const bismillahText = document.getElementById('bismillahText');
+    let currentPage = 1;
+    const limit = 30;
+    let currentSurah = 36;
+
+    // Total ayat tiap surah
+    const totalAyatMap = {
+      36: 83,   // Yasin
+      56: 96,   // Al-Waqiah
+      112: 4,   // Ikhlas
+      67: 30,
+    };
+
+    async function loadSurah(surahId) {
+      currentSurah = surahId;
+
+      // Mode Hadroh
+      if (currentSurah === 888) {
+        loadHadroh();
+        return;
+      }
+
+      // Mode Tahlil
+      if (currentSurah === 999) {
+        loadTahlil();
+        return;
+      }
+
+      // Jika bukan Tahlil atau Hadroh, lanjutkan ke Surah biasa
+      currentPage = 1;
+      const totalAyat = totalAyatMap[surahId] || 0;
+      if (totalAyat === 0) {
+        versesContainer.innerHTML = '<div class="loading">Surah tidak ditemukan.</div>';
+        return;
+      }
+      fetchVerses(currentPage, totalAyat);
+
+      // Highlight active surah in sidebar
+      const buttons = document.querySelectorAll('.sidebar button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`surah${getSurahName(surahId)}`).classList.add('active');
+
+      closeSidebar(); // Tutup sidebar setelah memilih surah
+    }
+
+    function getSurahName(surahId) {
+      switch (surahId) {
+        case 36: return 'Yasin';
+        case 56: return 'AlWaqiah';
+        case 112: return 'Ikhlas';
+        case 67: return 'AlMulk';
+        case 999: return 'Tahlil';
+        case 888: return 'Hadroh';
+        default: return '';
+      }
+    }
+
+    async function fetchVerses(page, totalAyat) {
+      const start = (page - 1) * limit + 1;
+      const end = Math.min(page * limit, totalAyat);
+      if (start > totalAyat) {
+        versesContainer.innerHTML = '<div class="loading">Tidak ada ayat lagi.</div>';
+        nextBtn.disabled = true;
+        return;
+      }
+      const url = `https://api.myquran.com/v2/quran/ayat/${currentSurah}/${start}-${end}`; 
+      versesContainer.innerHTML = '<div class="loading">Memuat ayat...</div>';
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.status && data.data.length > 0) {
+          renderVerses(data.data);
+          currentPage = page;
+          prevBtn.disabled = page === 1;
+          nextBtn.disabled = end === totalAyat;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          versesContainer.innerHTML = '<div class="loading">Tidak ada data ditemukan.</div>';
+          nextBtn.disabled = true;
+        }
+      } catch (err) {
+        console.error(err);
+        versesContainer.innerHTML = '<div class="loading">Gagal memuat ayat.</div>';
+      }
+    }
+
+    function renderVerses(verses) {
+      versesContainer.innerHTML = '';
+      verses.forEach((verse) => {
+        const verseEl = document.createElement('div');
+        verseEl.className = 'card-glass p-3 mb-3';
+        verseEl.innerHTML = `
+          <span class="number">${toArabicNumber(verse.ayah)}</span>
+          <div class="arabic">${verse.arab}</div>
+          <div class="latin mt-2"><strong>${verse.latin}</strong></div>
+          <div class="text mt-2">${verse.text}</div>
+          <div class="d-flex gap-2 mt-2">
+            <button onclick="playAudio(this, '${verse.audio}')" class="btn btn-sm btn-pill">
+              <i class="bi bi-play-fill me-1"></i> Play
+            </button>
+            <button onclick="stopAudio()" class="btn btn-sm btn-pill">
+              <i class="bi bi-stop-fill me-1"></i> Stop
+            </button>
+          </div>
+        `;
+        versesContainer.appendChild(verseEl);
+      });
+    }
+
+    async function loadTahlil() {
+      versesContainer.innerHTML = '<div class="loading">Memuat bacaan tahlil...</div>';
+      try {
+        const res = await fetch('tahlil.json');
+        const data = await res.json();
+
+        if (data.status && data.result.length > 0) {
+          renderTahlil(data.result);
+        } else {
+          versesContainer.innerHTML = '<div class="loading">Gagal memuat tahlil.</div>';
+        }
+      } catch (err) {
+        console.error(err);
+        versesContainer.innerHTML = '<div class="loading text-danger">Error: Gagal memuat tahlil.</div>';
+      }
+    }
+
+    function renderTahlil(items) {
+      versesContainer.innerHTML = '';
+      items.forEach((item) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'card-glass p-3 mb-3';
+        itemEl.innerHTML = `
+          <h5>${item.judul || ''}</h5>
+          <span class="number">${toArabicNumber(item.no)}</span>
+          <div class="arabic">${item.arab}</div>
+          <div class="text mt-2">${item.id}</div>
+        `;
+        versesContainer.appendChild(itemEl);
+      });
+
+      nextBtn.disabled = true;
+      prevBtn.disabled = true;
+    }
+
+    async function loadHadroh() {
+      versesContainer.innerHTML = '<div class="loading">Memuat daftar almarhum...</div>';
+      try {
+        const res = await fetch('hadroh.json');
+        const data = await res.json();
+
+        if (data.status && data.result.length > 0) {
+          renderHadroh(data.result);
+        } else {
+          versesContainer.innerHTML = '<div class="loading text-danger">Gagal memuat daftar hadroh.</div>';
+        }
+      } catch (err) {
+        console.error(err);
+        versesContainer.innerHTML = `<div class="loading text-danger">Error: ${err.message}</div>`;
+      }
+    }
+
+    function renderHadroh(items) {
+      versesContainer.innerHTML = '';
+      items.forEach((item, index) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'card-glass p-3 mb-3';
+        itemEl.innerHTML = `
+          <span class="number">${toArabicNumber(index + 1)}</span>
+          <h5>${item.nama}</h5>
+        `;
+        versesContainer.appendChild(itemEl);
+      });
+
+      nextBtn.disabled = true;
+      prevBtn.disabled = true;
+    }
+
+    let currentAudio = null;
+    function playAudio(btn, src) {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
+      currentAudio = new Audio(src);
+      currentAudio.play().catch(e => alert("Gagal memainkan audio."));
+      btn.innerHTML = `<i class="bi bi-play-fill me-1"></i> Playing...`;
+    }
+    function stopAudio() {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+      }
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(btn => {
+        if (btn.innerHTML.includes('Playing')) {
+          btn.innerHTML = `<i class="bi bi-play-fill me-1"></i> Play`;
+        }
+      });
+    }
+
+    function toArabicNumber(num) {
+      const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+      return num.toString().split('').map(d => arabicDigits[d]).join('');
+    }
+
+    // Event listener untuk tombol Next/Prev
+    nextBtn.addEventListener('click', () => {
+      const totalAyat = totalAyatMap[currentSurah];
+      if (!nextBtn.disabled) fetchVerses(currentPage + 1, totalAyat);
+    });
+    prevBtn.addEventListener('click', () => {
+      const totalAyat = totalAyatMap[currentSurah];
+      if (!prevBtn.disabled) fetchVerses(currentPage - 1, totalAyat);
+    });
+
+    // Toggle Sidebar
+    const navToggle = document.getElementById('navToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const closeSidebarBtn = document.getElementById('closeSidebar');
+    navToggle.addEventListener('click', () => {
+      sidebar.classList.add('active');
+      overlay.classList.add('active');
+    });
+    closeSidebarBtn.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+    function closeSidebar() {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+    }
+
+    // Toggle Mode Malam
+    const darkModeBtn = document.getElementById('toggleDarkMode');
+    const iconDarkMode = document.getElementById('iconDarkMode');
+    darkModeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      iconDarkMode.classList.toggle('bi-moon-fill');
+      iconDarkMode.classList.toggle('bi-sun-fill');
+    });
+
+    // Load awal
+    loadSurah(currentSurah);
+  </script>
+</body>
+</html>

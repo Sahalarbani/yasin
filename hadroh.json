@@ -1,0 +1,64 @@
+{
+  "status": true,
+  "crear": "@SahalArbani",
+  "source": "Data Keluarga",
+  "result": [
+    {
+      "nama": "Mbah Ngarip bin Mbah Salim",
+      "ayah": "Mbah Salim"
+    },
+    {
+      "nama": "Mohammad Abdul Ghofur bin Mbah Ngarip",
+      "ayah": "Mbah Ngarip"
+    },
+    {
+      "nama": "Siti Muk Amanah bin Mbah Ngarip",
+      "ayah": "Mbah Ngarip"
+    },
+    {
+      "nama": "Ahmad Choirul Khamid bin Mbah Ngarip",
+      "ayah": "Mbah Ngarip"
+    },
+    {
+      "nama": "Mbah Sapuan bin Mbah Tamrin",
+      "ayah": "Mbah Tamrin"
+    },
+    {
+      "nama": "Mbah Yatimah binti Mbah Sulaiman",
+      "ayah": "Mbah Sulaiman"
+    },
+    {
+      "nama": "Mbah Sulaiman sekalian"
+    },
+    {
+      "nama": "Mbah Salim sekalian"
+    },
+    {
+      "nama": "Mbah Sarmuji sekalian"
+    },
+    {
+      "nama": "Mbah Soejoyo sekalian"
+    },
+    {
+      "nama": "Mbah Subari sekalian"
+    },
+    {
+      "nama": "Mbah Sumomarno sekalian"
+    },
+    {
+      "nama": "Mbah Tayib bin Mbah Sumomarno",
+      "ayah": "Mbah Sumomarno"
+    },
+    {
+      "nama": "Mbah Siyem binti Sumomarno",
+      "ayah": "Sumomarno"
+    },
+    {
+      "nama": "Mbah Dapi binti Sumomarno",
+      "ayah": "Sumomarno"
+    },
+    {
+      "nama": "Mbah Mariman sekalian"
+    }
+  ]
+}
