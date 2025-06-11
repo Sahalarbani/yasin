@@ -470,7 +470,7 @@ async function showFloatingModal() {
     if (oldModal) oldModal.remove();
 
     // Load file HTML modal
-    const res = await fetch("/update-modal.html"); // Sesuaikan path jika perlu
+    const res = await fetch("update-modal.html"); // Sesuaikan path jika perlu
     const htmlText = await res.text();
 
     // Masukkan modal ke body
