@@ -1,0 +1,16 @@
+{
+  "created_by": "Sahal Arbani",
+  "version": "2.3.1",
+  "tanggal_update": "2025-06-10",
+  "fitur_baru": [
+    "Update UI",
+    "Fix Bug",
+    "Uipdate Ui Tahlil",
+    "Update Menu Hadroh",
+    "update tombol lanjut tahlil di menu hadroh",
+    "jika audio tidak bisa di play pilih dulu qori nya"
+  ],
+  "bug": [
+    "Teks Latin Di Menu Tahlil"
+    ]
+}
