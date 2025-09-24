@@ -157,7 +157,7 @@ body {
 .mt-6 { margin-top: 80px; }
 .mt-7 { margin-top: 140px; }
 .mt-8 { margin-top: 60px; }
-.mt-9 { margin-top: 280px; }
+.mt-9 { margin-top: 210px; }
 .my-31 { margin-top: var(--space-4); }
 
 .bg-blur {
@@ -241,11 +241,12 @@ body {
 
 .verse-text-arab {
   font-family: var(--font-arabic);
-  font-size: 1.875rem;
+  font-size: 1.875rem; /* Ukuran default */
   text-align: right;
   line-height: 2.2;
   font-weight: 400;
   margin-bottom: var(--space-4);
+  transition: font-size 0.3s ease; /* BARU: transisi halus saat ganti ukuran */
 }
 
 .verse-text-latin {
@@ -388,7 +389,6 @@ body {
     font-size: 0.8rem;
   }
   
-  .mt-9 { margin-top: 220px; }
   .mt-7 { margin-top: 120px; }
 }
 
@@ -418,7 +418,70 @@ html {
   background-color: var(--primary-400);
   color: white;
 }
-  </style>
+  
+/* CSS untuk Floating Action Button (FAB) */
+.fab-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+}
+
+.fab-main {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.fab-options {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 1rem;
+  transform: scale(0);
+  transform-origin: bottom center;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fab-container.open .fab-options {
+  transform: scale(1);
+}
+
+.fab-option {
+  width: 48px;
+  height: 48px;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.fab-container.open .fab-option {
+  opacity: 1;
+}
+
+/* Penyesuaian untuk Halaman dengan FAB */
+#detailPage, #tahlilPage, #hadrohPage {
+  /* Memberi ruang di bagian bawah agar konten tidak tertutup FAB */
+  padding-bottom: 80px; 
+}
+</style>
 </head>
 <body>
 
@@ -427,53 +490,88 @@ html {
     <span class="navbar-brand mb-0 h1">
       <i class="bi bi-book me-2"></i>Al-Qur'an Digital
     </span>
-    <div class="d-flex align-items-center gap-3">
-    <select id="qoriSelect" class="form-dark form-select border-0" style="min-width: 180px;">
-      <option selected>Pilih Qori</option>
-      <option value="01">Abdullah Al-Juhany</option>
-      <option value="02">Abdul Muhsin Al-Qasim</option>
-      <option value="03">Abdurrahman As-Sudais</option>
-      <option value="04">Ibrahim Al-Dossari</option>
-      <option value="05">Misyari Rasyid Al-Afasi</option>
-    </select>
-    <button class="btn btn-pill" id="darkModeToggle">
-      <i class="bi bi-moon-fill" id="darkModeIcon"></i>
-    </button>
+    <div class="d-none d-lg-flex align-items-center gap-3">
+      <select id="qoriSelect" class="form-dark form-select border-0" style="min-width: 180px;">
+        <option selected>Pilih Qori</option>
+        <option value="01">Abdullah Al-Juhany</option>
+        <option value="02">Abdul Muhsin Al-Qasim</option>
+        <option value="03">Abdurrahman As-Sudais</option>
+        <option value="04">Ibrahim Al-Dossari</option>
+        <option value="05">Misyari Rasyid Al-Afasi</option>
+      </select>
+      <button class="btn btn-pill" id="darkModeToggle">
+        <i class="bi bi-moon-fill" id="darkModeIcon"></i>
+      </button>
     </div>
+    <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
   </div>
 </nav>
 
+<div class="offcanvas offcanvas-end bg-blur" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel" data-bs-theme="dark">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu & Pengaturan</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="d-grid gap-3" id="sidebarControlsContainer">
+      <div>
+        <label for="searchInput" class="form-label">Cari Surah</label>
+        <input type="text" id="searchInput" class="form-dark form-control" placeholder="Contoh: Al-Fatihah">
+      </div>
+      <hr class="my-2">
+      <div>
+        <label for="qoriSelectMobile" class="form-label">Pilih Qori</label>
+        <select id="qoriSelectMobile" class="form-dark form-select border-0">
+          <option selected>Pilih Qori</option>
+          <option value="01">Abdullah Al-Juhany</option>
+          <option value="02">Abdul Muhsin Al-Qasim</option>
+          <option value="03">Abdurrahman As-Sudais</option>
+          <option value="04">Ibrahim Al-Dossari</option>
+          <option value="05">Misyari Rasyid Al-Afasi</option>
+        </select>
+      </div>
+      <button class="btn btn-pill d-flex justify-content-between align-items-center" id="darkModeToggleMobile">
+        <span>Ganti Tema</span>
+        <i class="bi bi-moon-fill" id="darkModeIconMobile"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="container mt-4">
   <div id="homePage" class="page active-page">
-    <div class="bg-blur fixed-top mt-8" style="padding: 1rem 0;">
-      <div class="container">
-        <input type="text" id="searchInput" class="form-dark form-control mb-3" placeholder="🔍 Cari Surah..." style="max-width: 400px; margin: 0 auto;">
-        <h2 class="text-center my-31" style="font-weight: 600; font-size: 1.75rem;">Daftar Surah</h2>
-      </div>
+    <div id="surahList" class="mt-4 row g-3"></div>
+  </div>
+
+  <div id="detailPage" class="page">
+    <div class="text-center my-4">
+      <h3 id="surahTitle" style="font-weight: 600; font-size: 1.75rem;"></h3>
     </div>
-    <div id="surahList" class="mt-9 row g-3"></div>
-  </div>
-
- <div id="detailPage" class="page">
-  <div class="bg-blur fixed-top mt-6" style="padding: 1rem 0;">
-    <div class="container d-flex flex-wrap gap-2 justify-content-center">
-    <button class="btn btn-pill" onclick="showPage('homePage')" style="min-width: 120px;">
-      <i class="bi bi-arrow-left-circle"></i> Kembali
-    </button>
-    <button class="btn btn-pill" onclick="playAllVerses()" style="min-width: 120px;">
-      <i class="bi bi-play-circle-fill"></i> Putar Semua
-    </button>
-    <button class="btn btn-pill" onclick="stopAudio()" style="min-width: 120px;">
-      <i class="bi bi-stop-circle"></i> Stop
-    </button>
+    <div id="versesContainer"></div>
+    <div class="fab-container">
+        <div class="fab-options">
+            <button class="fab-option btn-pill" onclick="changeFontSize('decrease')" data-bs-toggle="tooltip" title="Perkecil Teks">
+                <i class="bi bi-zoom-out"></i>
+            </button>
+            <button class="fab-option btn-pill" onclick="changeFontSize('increase')" data-bs-toggle="tooltip" title="Perbesar Teks">
+                <i class="bi bi-zoom-in"></i>
+            </button>
+            <button class="fab-option btn-pill" onclick="showPage('homePage')" data-bs-toggle="tooltip" title="Kembali">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+            <button class="fab-option btn-pill" onclick="stopAudio()" data-bs-toggle="tooltip" title="Stop">
+                <i class="bi bi-stop-fill"></i>
+            </button>
+            <button class="fab-option btn-pill" onclick="playAllVerses()" data-bs-toggle="tooltip" title="Putar Semua">
+                <i class="bi bi-play-fill"></i>
+            </button>
+        </div>
+        <button class="fab-main btn-pill" id="fabToggle">
+            <i class="bi bi-gear-fill"></i>
+        </button>
     </div>
-  </div>
-
-  <div class="text-end mt-7">
-    <h3 id="surahTitle" class="text-center mb-4" style="font-weight: 600; font-size: 1.75rem;"></h3>
-  </div>
-
-  <div id="versesContainer"></div>
 </div>
 
 
@@ -482,59 +580,85 @@ html {
   <p class="mt-3">Sedang memuat data...</p>
 </div>
 <audio id="audioPlayer" controls hidden></audio>
-<!-- Tambahan halaman Tahlil -->
+
 <div id="tahlilPage" class="container mt-4 page">
-<div class="bg-blur fixed-top mt-6" style="padding: 1rem 0;">
-  <div class="container text-center">
-  <button class="btn btn-pill mb-3" onclick="showPage('homePage')">
-    <i class="bi bi-arrow-left-circle"></i> Kembali
-  </button>
-  </div>
-  </div>
-  <h2 class="text-center mt-7" style="font-weight: 600; font-size: 1.75rem;">Bacaan Tahlil</h2>
+  <h2 class="text-center mt-8" style="font-weight: 600; font-size: 1.75rem;">Bacaan Tahlil</h2>
   <div id="tahlilContent" class="mt-3"></div>
+  <div class="fab-container">
+      <button class="fab-main btn-pill" onclick="showPage('homePage')" title="Kembali">
+          <i class="bi bi-arrow-left"></i>
+      </button>
+  </div>
 </div>
 
-<!-- Tambahan halaman Hadroh -->
 <div id="hadrohPage" class="container mt-4 page">
-<div class="bg-blur fixed-top mt-6" style="padding: 1rem 0;">
-  <div class="container text-center">
-  <button class="btn btn-pill mb-3" onclick="showPage('homePage')">
-    <i class="bi bi-arrow-left-circle"></i> Kembali
-  </button>
-  </div>
-  </div>
-  <h2 class="text-center mt-7" style="font-weight: 600; font-size: 1.75rem;">Daftar Hadroh</h2>
+  <h2 class="text-center mt-8" style="font-weight: 600; font-size: 1.75rem;">Daftar Hadroh</h2>
   <div id="hadrohList" class="mt-3"></div>
   <button class="btn btn-pill mb-3" onclick="showPage('tahlilPage', 3)">
     <i class="bi bi-arrow-right-circle"></i> Lanjut Tahlil
   </button>
+  <div class="fab-container">
+      <button class="fab-main btn-pill" onclick="showPage('homePage')" title="Kembali">
+          <i class="bi bi-arrow-left"></i>
+      </button>
+  </div>
 </div>
 
 <script>
 const API_URL = "https://equran.id/api/v2";
 let allSurahs = [], versesData = [], currentIndex = 0;
 
+// [BARU] Variabel untuk mengelola ukuran font Arab
+let currentFontSize = 1.875; // Ukuran awal dalam rem (sesuai CSS)
+const FONT_STEP = 0.125;     // Seberapa besar perubahan ukuran setiap klik
+const MAX_FONT_SIZE = 3;       // Ukuran maksimum
+const MIN_FONT_SIZE = 1.25;    // Ukuran minimum
+
 function toggleDarkMode(force = null) {
   const body = document.body;
-  const icon = document.getElementById("darkModeIcon");
-
+  const icons = document.querySelectorAll("#darkModeIcon, #darkModeIconMobile");
   const isDark = force !== null ? force : !body.classList.contains("dark-mode");
-
   body.classList.toggle("dark-mode", isDark);
   body.classList.toggle("light-mode", !isDark);
-
-  icon.classList.toggle("bi-sun-fill", isDark);
-  icon.classList.toggle("bi-moon-fill", !isDark);
+  icons.forEach(icon => {
+    icon.classList.toggle("bi-sun-fill", !isDark);
+    icon.classList.toggle("bi-moon-fill", isDark);
+  });
 }
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("darkModeToggle");
-if (toggleBtn) {
-  toggleBtn.addEventListener("click", () => toggleDarkMode());
-}
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => toggleDarkMode());
+  }
+  const toggleBtnMobile = document.getElementById("darkModeToggleMobile");
+  if (toggleBtnMobile) {
+    toggleBtnMobile.addEventListener("click", () => toggleDarkMode());
+  }
+  const qoriSelect = document.getElementById("qoriSelect");
+  const qoriSelectMobile = document.getElementById("qoriSelectMobile");
+  if (qoriSelect && qoriSelectMobile) {
+    qoriSelectMobile.addEventListener('change', () => { qoriSelect.value = qoriSelectMobile.value; });
+    qoriSelect.addEventListener('change', () => { qoriSelectMobile.value = qoriSelect.value; });
+  }
+
+  const fabToggle = document.getElementById('fabToggle');
+  const fabContainer = document.querySelector('#detailPage .fab-container'); // lebih spesifik
+  if(fabToggle && fabContainer) {
+    fabToggle.addEventListener('click', () => {
+      fabContainer.classList.toggle('open');
+      const icon = fabToggle.querySelector('i');
+      icon.classList.toggle('bi-gear-fill');
+      icon.classList.toggle('bi-x-lg');
+    });
+  }
+
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
 });
+
 
 function showLoading(show) {
   document.getElementById("loadingSpinner").style.display = show ? 'block' : 'none';
@@ -590,7 +714,7 @@ async function loadSurahDetail(nomor) {
   const res = await fetch(`${API_URL}/surat/${nomor}`);
   const data = await res.json();
   versesData = data.data.ayat;
-  document.getElementById("surahTitle").innerText = `${data.data.namaLatin} (${data.data.nomor})`;
+  document.getElementById("surahTitle").innerText = `${data.data.namaLatin} (${data.data.arti})`;
 
   const container = document.getElementById("versesContainer");
   container.innerHTML = "";
@@ -600,19 +724,22 @@ async function loadSurahDetail(nomor) {
     div.className = "verse-container";
     div.setAttribute("id", `verse-${i}`);
     div.innerHTML = `
-      <div class="verse-number-arabic">
-        <span class="badge bg-warning text-dark">${v.nomorAyat}</span>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge bg-primary text-dark rounded-pill">${v.nomorAyat}</span>
+        <button class="btn btn-pill btn-sm" onclick="playVerse(${i})">
+          <i class="bi bi-volume-up-fill me-1"></i> Putar
+        </button>
       </div>
       <div class="verse-text-arab">${v.teksArab}</div>
-      <p class="verse-text-latin">${v.teksLatin}</p>
-      <p class="mb-3" style="color: rgba(255, 255, 255, 0.9);">${v.teksIndonesia}</p>
-      <button class="btn btn-pill btn-sm" onclick="playVerse(${i})">
-        <i class="bi bi-volume-up-fill"></i> Putar Ayat
-      </button>`;
+      <p class="verse-text-latin mt-4">${v.teksLatin}</p>
+      <p style="color: rgba(255, 255, 255, 0.9);">${v.teksIndonesia}</p>`;
     container.appendChild(div);
   });
+  
+  applyCurrentFontSize(); // [BARU] Terapkan ukuran font saat ini ke ayat yang baru dimuat
   showPage("detailPage");
   showLoading(false);
+  window.scrollTo(0, 0);
 }
 
 function getSelectedQori() {
@@ -620,10 +747,17 @@ function getSelectedQori() {
 }
 
 function playVerse(index) {
+  // [BARU] Validasi qori
+  const selectedQori = getSelectedQori();
+  if (selectedQori === "Pilih Qori") {
+    alert("Silakan pilih Qori terlebih dahulu pada menu di pojok kanan atas.");
+    return; // Hentikan fungsi jika qori belum dipilih
+  }
+
   currentIndex = index;
   const verse = versesData[index];
   const audio = document.getElementById("audioPlayer");
-  audio.src = verse.audio[getSelectedQori()];
+  audio.src = verse.audio[selectedQori];
   audio.play();
   highlightVerse(index);
 }
@@ -638,6 +772,12 @@ function highlightVerse(index) {
 }
 
 function playAllVerses() {
+  // [BARU] Validasi qori
+  if (getSelectedQori() === "Pilih Qori") {
+    alert("Silakan pilih Qori terlebih dahulu pada menu di pojok kanan atas.");
+    return; // Hentikan fungsi jika qori belum dipilih
+  }
+  
   if (!versesData.length) return;
   currentIndex = 0;
   playSequential();
@@ -664,14 +804,31 @@ function stopAudio() {
   audio.currentTime = 0;
   document.querySelectorAll(".verse-container").forEach(el => el.classList.remove("active"));
 }
-// Tambahkan fungsi untuk memuat data tahlil
+
+// [BARU] Fungsi untuk menerapkan ukuran font saat ini ke semua elemen ayat
+function applyCurrentFontSize() {
+  document.querySelectorAll('#versesContainer .verse-text-arab').forEach(verse => {
+    verse.style.fontSize = `${currentFontSize}rem`;
+  });
+}
+
+// [BARU] Fungsi untuk mengubah ukuran font
+function changeFontSize(direction) {
+  if (direction === 'increase' && currentFontSize < MAX_FONT_SIZE) {
+    currentFontSize += FONT_STEP;
+  } else if (direction === 'decrease' && currentFontSize > MIN_FONT_SIZE) {
+    currentFontSize -= FONT_STEP;
+  }
+  applyCurrentFontSize(); // Terapkan ukuran baru
+}
+
+
 async function loadTahlil(verseIndex = null) {
   const container = document.getElementById("tahlilContent");
   container.innerHTML = "";
   try {
     const res = await fetch("tahlil.json");
     const data = await res.json();
-
     data.result.forEach((item, index) => {
       container.innerHTML += `
         <div class="verse-container mb-4" id="tahlil-verse-${index}">
@@ -682,22 +839,18 @@ async function loadTahlil(verseIndex = null) {
           ${index + 1 === 4 ? '<button class="btn btn-pill mt-3" onclick="showPage(\'hadrohPage\')"><i class="bi bi-music-note-list"></i> Lihat Hadroh</button>' : ''}
         </div>`;
     });
-
-    // Jika ada verseIndex, scroll dan sorot ayat tersebut
     if (verseIndex !== null) {
       const targetVerse = document.getElementById(`tahlil-verse-${verseIndex}`);
       if (targetVerse) {
-        targetVerse.style.backgroundColor = "#2c2c2c"; // Highlight warna
+        targetVerse.style.backgroundColor = "#2c2c2c";
         targetVerse.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
-
   } catch (err) {
     container.innerHTML = `<div class="text-danger">Gagal memuat tahlil: ${err.message}</div>`;
   }
 }
 
-// Tambahkan fungsi untuk memuat data hadroh
 async function loadHadroh() {
   const container = document.getElementById("hadrohList");
   container.innerHTML = "";
@@ -716,38 +869,41 @@ async function loadHadroh() {
   }
 }
 
-// Modifikasi fungsi showPage
 function showPage(id, verseIndex = null) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active-page"));
   const page = document.getElementById(id);
   page.classList.add("active-page");
-
-  if (id === "tahlilPage") {
-    loadTahlil(verseIndex); // Kirim index ayat ke loadTahlil
-  }
-  if (id === "hadrohPage") {
-    loadHadroh();
-  }
+  if (id === "tahlilPage") { loadTahlil(verseIndex); }
+  if (id === "hadrohPage") { loadHadroh(); }
 }
 </script>
-<!-- Tambahkan tombol navigasi di beranda -->
 <script>
 window.addEventListener('DOMContentLoaded', () => {
-  const homeNav = document.getElementById("surahList");
+  const sidebarContainer = document.getElementById("sidebarControlsContainer");
+
+  const divider = document.createElement("hr");
+  divider.className = "my-3";
+  sidebarContainer.appendChild(divider);
+
   const tahlilBtn = document.createElement("button");
+  tahlilBtn.innerHTML = '<i class="bi bi-book-half me-2"></i>Buka Tahlil';
+  tahlilBtn.className = "btn btn-pill my-2 w-100";
+  tahlilBtn.onclick = () => {
+      showPage("tahlilPage");
+      bootstrap.Offcanvas.getInstance(document.getElementById('sidebarMenu')).hide();
+  };
+  sidebarContainer.appendChild(tahlilBtn);
+
   const hadrohBtn = document.createElement("button");
-  tahlilBtn.innerHTML = '<i class="bi bi-book me-2"></i>Buka Tahlil';
   hadrohBtn.innerHTML = '<i class="bi bi-music-note-list me-2"></i>Buka Hadroh';
-  tahlilBtn.className = hadrohBtn.className = "btn btn-pill my-2 w-100";
-  tahlilBtn.onclick = () => showPage("tahlilPage");
-  hadrohBtn.onclick = () => showPage("hadrohPage");
-  const div = document.createElement("div");
-  div.className = "bg-blur fixed-top col-12 mt-7";
-  div.style.padding = "1rem";
-  div.appendChild(tahlilBtn);
-  div.appendChild(hadrohBtn);
-  homeNav.before(div);
+  hadrohBtn.className = "btn btn-pill my-2 w-100";
+  hadrohBtn.onclick = () => {
+      showPage("hadrohPage");
+      bootstrap.Offcanvas.getInstance(document.getElementById('sidebarMenu')).hide();
+  };
+  sidebarContainer.appendChild(hadrohBtn);
 });
+
 function closeFloatingModal() {
   const modal = document.getElementById("floatingModal");
   if (modal) modal.remove();
@@ -755,24 +911,17 @@ function closeFloatingModal() {
 
 async function showFloatingModal() {
   try {
-    // Hapus modal lama jika sudah ada
     const oldModal = document.getElementById("floatingModal");
     if (oldModal) oldModal.remove();
-
-    // Load file HTML modal
-    const res = await fetch("update-modal.html"); // Sesuaikan path jika perlu
+    const res = await fetch("update-modal.html");
     const htmlText = await res.text();
-
-    // Masukkan modal ke body
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = htmlText.trim();
     document.body.appendChild(tempDiv);
-
-    // Setelah modal dimasukkan, ambil data update.json
     const updateRes = await fetch("update.json");
     const data = await updateRes.json();
     const fiturList = data.fitur_baru.map(f => `<li> ${f}</li>`).join("");
-const bug = data.bug.map(f => `<li> ${f}</li>`).join("");
+    const bug = data.bug.map(f => `<li> ${f}</li>`).join("");
     const html = `
       <p><strong><i class="bi bi-person-vcard-fill me-2"></i>Create by:</strong> ${data.created_by}</p>
       <p><strong><i class="bi bi-github me-2"></i>Update versi:</strong> ${data.version}</p>
@@ -785,7 +934,6 @@ const bug = data.bug.map(f => `<li> ${f}</li>`).join("");
     document.getElementById("floatingContent").innerHTML = html;
   } catch (err) {
     console.error(err);
-    alert("Gagal memuat modal pembaruan.");
   }
 }
 
