@@ -422,26 +422,58 @@ html {
 </head>
 <body>
 
-<nav class="navbar navbar-dark bg-blur fixed-top">
+<!-- Responsive Navbar -->
+<nav class="navbar navbar-dark bg-blur fixed-top d-none d-md-flex">
   <div class="container-fluid">
     <span class="navbar-brand mb-0 h1">
       <i class="bi bi-book me-2"></i>Al-Qur'an Digital
     </span>
     <div class="d-flex align-items-center gap-3">
-    <select id="qoriSelect" class="form-dark form-select border-0" style="min-width: 180px;">
-      <option selected>Pilih Qori</option>
-      <option value="01">Abdullah Al-Juhany</option>
-      <option value="02">Abdul Muhsin Al-Qasim</option>
-      <option value="03">Abdurrahman As-Sudais</option>
-      <option value="04">Ibrahim Al-Dossari</option>
-      <option value="05">Misyari Rasyid Al-Afasi</option>
-    </select>
-    <button class="btn btn-pill" id="darkModeToggle">
-      <i class="bi bi-moon-fill" id="darkModeIcon"></i>
-    </button>
+      <select id="qoriSelect" class="form-dark form-select border-0" style="min-width: 180px;">
+        <option selected>Pilih Qori</option>
+        <option value="01">Abdullah Al-Juhany</option>
+        <option value="02">Abdul Muhsin Al-Qasim</option>
+        <option value="03">Abdurrahman As-Sudais</option>
+        <option value="04">Ibrahim Al-Dossari</option>
+        <option value="05">Misyari Rasyid Al-Afasi</option>
+      </select>
+      <button class="btn btn-pill" id="darkModeToggle">
+        <i class="bi bi-moon-fill" id="darkModeIcon"></i>
+      </button>
     </div>
   </div>
 </nav>
+
+<!-- Mobile Bottom Navbar -->
+<nav class="navbar navbar-dark bg-blur fixed-bottom d-flex d-md-none justify-content-around p-0" style="height: 60px; box-shadow: 0 -2px 10px rgba(0,0,0,0.15);">
+  <button class="btn btn-pill flex-fill m-1" onclick="showPage('homePage')">
+    <i class="bi bi-house-door"></i><br><span style="font-size:0.75rem;">Beranda</span>
+  </button>
+  <button class="btn btn-pill flex-fill m-1" onclick="showPage('tahlilPage')">
+    <i class="bi bi-book"></i><br><span style="font-size:0.75rem;">Tahlil</span>
+  </button>
+  <button class="btn btn-pill flex-fill m-1" onclick="showPage('hadrohPage')">
+    <i class="bi bi-music-note-list"></i><br><span style="font-size:0.75rem;">Hadroh</span>
+  </button>
+  <button class="btn btn-pill flex-fill m-1" id="darkModeToggleMobile">
+    <i class="bi bi-moon-fill" id="darkModeIconMobile"></i><br><span style="font-size:0.75rem;">Mode</span>
+  </button>
+</nav>
+<script>
+// Mobile dark mode toggle
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtnMobile = document.getElementById("darkModeToggleMobile");
+  if (toggleBtnMobile) {
+    toggleBtnMobile.addEventListener("click", () => {
+      toggleDarkMode();
+      // Sync icon
+      const isDark = document.body.classList.contains("dark-mode");
+      document.getElementById("darkModeIconMobile").classList.toggle("bi-sun-fill", isDark);
+      document.getElementById("darkModeIconMobile").classList.toggle("bi-moon-fill", !isDark);
+    });
+  }
+});
+</script>
 
 <div class="container mt-4">
   <div id="homePage" class="page active-page">
@@ -455,18 +487,31 @@ html {
   </div>
 
  <div id="detailPage" class="page">
-  <div class="bg-blur fixed-top mt-6" style="padding: 1rem 0;">
+  <!-- Desktop/Tablet Top Bar -->
+  <div class="bg-blur fixed-top mt-6 d-none d-md-block" style="padding: 1rem 0;">
     <div class="container d-flex flex-wrap gap-2 justify-content-center">
-    <button class="btn btn-pill" onclick="showPage('homePage')" style="min-width: 120px;">
-      <i class="bi bi-arrow-left-circle"></i> Kembali
-    </button>
-    <button class="btn btn-pill" onclick="playAllVerses()" style="min-width: 120px;">
-      <i class="bi bi-play-circle-fill"></i> Putar Semua
-    </button>
-    <button class="btn btn-pill" onclick="stopAudio()" style="min-width: 120px;">
-      <i class="bi bi-stop-circle"></i> Stop
-    </button>
+      <button class="btn btn-pill" onclick="showPage('homePage')" style="min-width: 120px;">
+        <i class="bi bi-arrow-left-circle"></i> Kembali
+      </button>
+      <button class="btn btn-pill" onclick="playAllVerses()" style="min-width: 120px;">
+        <i class="bi bi-play-circle-fill"></i> Putar Semua
+      </button>
+      <button class="btn btn-pill" onclick="stopAudio()" style="min-width: 120px;">
+        <i class="bi bi-stop-circle"></i> Stop
+      </button>
     </div>
+  </div>
+  <!-- Mobile Slide Bar -->
+  <div class="fixed-bottom d-flex d-md-none justify-content-around bg-blur" style="height: 60px; z-index: 1050; box-shadow: 0 -2px 10px rgba(0,0,0,0.15);">
+    <button class="btn btn-pill flex-fill m-1" onclick="showPage('homePage')">
+      <i class="bi bi-arrow-left-circle"></i><br><span style="font-size:0.75rem;">Kembali</span>
+    </button>
+    <button class="btn btn-pill flex-fill m-1" onclick="playAllVerses()">
+      <i class="bi bi-play-circle-fill"></i><br><span style="font-size:0.75rem;">Putar</span>
+    </button>
+    <button class="btn btn-pill flex-fill m-1" onclick="stopAudio()">
+      <i class="bi bi-stop-circle"></i><br><span style="font-size:0.75rem;">Stop</span>
+    </button>
   </div>
 
   <div class="text-end mt-7">
@@ -484,31 +529,52 @@ html {
 <audio id="audioPlayer" controls hidden></audio>
 <!-- Tambahan halaman Tahlil -->
 <div id="tahlilPage" class="container mt-4 page">
-<div class="bg-blur fixed-top mt-6" style="padding: 1rem 0;">
+<!-- Desktop/Tablet Top Bar -->
+<div class="bg-blur fixed-top mt-6 d-none d-md-block" style="padding: 1rem 0;">
   <div class="container text-center">
-  <button class="btn btn-pill mb-3" onclick="showPage('homePage')">
-    <i class="bi bi-arrow-left-circle"></i> Kembali
+    <button class="btn btn-pill mb-3" onclick="showPage('homePage')">
+      <i class="bi bi-arrow-left-circle"></i> Kembali
+    </button>
+  </div>
+</div>
+<!-- Mobile Slide Bar -->
+<div class="fixed-bottom d-flex d-md-none justify-content-around bg-blur" style="height: 60px; z-index: 1050; box-shadow: 0 -2px 10px rgba(0,0,0,0.15);">
+  <button class="btn btn-pill flex-fill m-1" onclick="showPage('homePage')">
+    <i class="bi bi-arrow-left-circle"></i><br><span style="font-size:0.75rem;">Kembali</span>
   </button>
-  </div>
-  </div>
+</div>
   <h2 class="text-center mt-7" style="font-weight: 600; font-size: 1.75rem;">Bacaan Tahlil</h2>
   <div id="tahlilContent" class="mt-3"></div>
 </div>
 
 <!-- Tambahan halaman Hadroh -->
 <div id="hadrohPage" class="container mt-4 page">
-<div class="bg-blur fixed-top mt-6" style="padding: 1rem 0;">
+<!-- Desktop/Tablet Top Bar -->
+<div class="bg-blur fixed-top mt-6 d-none d-md-block" style="padding: 1rem 0;">
   <div class="container text-center">
-  <button class="btn btn-pill mb-3" onclick="showPage('homePage')">
-    <i class="bi bi-arrow-left-circle"></i> Kembali
+    <button class="btn btn-pill mb-3" onclick="showPage('homePage')">
+      <i class="bi bi-arrow-left-circle"></i> Kembali
+    </button>
+  </div>
+</div>
+<!-- Mobile Slide Bar -->
+<div class="fixed-bottom d-flex d-md-none justify-content-around bg-blur" style="height: 60px; z-index: 1050; box-shadow: 0 -2px 10px rgba(0,0,0,0.15);">
+  <button class="btn btn-pill flex-fill m-1" onclick="showPage('homePage')">
+    <i class="bi bi-arrow-left-circle"></i><br><span style="font-size:0.75rem;">Kembali</span>
   </button>
-  </div>
-  </div>
+</div>
   <h2 class="text-center mt-7" style="font-weight: 600; font-size: 1.75rem;">Daftar Hadroh</h2>
   <div id="hadrohList" class="mt-3"></div>
-  <button class="btn btn-pill mb-3" onclick="showPage('tahlilPage', 3)">
+  <!-- Desktop/Tablet Only -->
+  <button class="btn btn-pill mb-3 d-none d-md-inline-block" onclick="showPage('tahlilPage', 3)">
     <i class="bi bi-arrow-right-circle"></i> Lanjut Tahlil
   </button>
+  <!-- Mobile Slide Bar for HadrohPage -->
+  <div class="fixed-bottom d-flex d-md-none justify-content-around bg-blur" style="height: 60px; z-index: 1050; box-shadow: 0 -2px 10px rgba(0,0,0,0.15);">
+    <button class="btn btn-pill flex-fill m-1" onclick="showPage('tahlilPage', 3)">
+      <i class="bi bi-arrow-right-circle"></i><br><span style="font-size:0.75rem;">Tahlil</span>
+    </button>
+  </div>
 </div>
 
 <script>
