@@ -1,14 +1,16 @@
 <!-- /pages/update-modal.html -->
-<div id="floatingModal" class="modal d-block" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;">
+<div id="floatingModal" class="modal d-block" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; backdrop-filter: blur(8px); background: rgba(0, 0, 0, 0.5);">
   <div class="modal-dialog modal-dialog-top">
-    <div class="text-bg-dark border border-primary modal-content bg-f p-3">
-        <div class="modal-header d-flex justify-content-between align-items-center w-100">
-  <h5 class="modal-title">Info Pembaruan</h5>
-  <button class="btn btn-pill" onclick="closeFloatingModal(); showPage('homePage')">
-    <i class="bi bi-x-octagon"></i> Tutup
-  </button>
-</div>
-      <div class="modal-body" id="floatingContent">
+    <div class="modal-content" style="background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 1rem; color: white;">
+      <div class="modal-header d-flex justify-content-between align-items-center border-bottom border-secondary">
+        <h5 class="modal-title" style="font-weight: 600; color: var(--primary-400);">
+          <i class="bi bi-info-circle me-2"></i>Info Pembaruan
+        </h5>
+        <button class="btn btn-pill" onclick="closeFloatingModal(); showPage('homePage')">
+          <i class="bi bi-x-lg"></i> Tutup
+        </button>
+      </div>
+      <div class="modal-body p-4" id="floatingContent" style="max-height: 70vh; overflow-y: auto;">
         <p>Memuat informasi pembaruan...</p>
       </div>
     </div>
