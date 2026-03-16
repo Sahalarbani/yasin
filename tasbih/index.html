@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Tasbih Digital iOS Style</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+</head>
+<body class="night">
+
+  <div class="toast" id="toastNotif">Target Tercapai!</div>
+  <button class="exit-zen-btn" onclick="toggleZenSetting()">Keluar Zen Mode</button>
+
+  <div class="modal-overlay" id="customModal">
+    <div class="modal-box">
+      <div class="modal-title">Atur Target Kustom</div>
+      <input type="text" id="customNameInput" class="modal-input" placeholder="Nama Dzikir" style="font-size:18px; margin-bottom:10px; font-weight:normal;" />
+      <input type="number" id="customInput" class="modal-input" placeholder="Jumlah Target" />
+      <div class="modal-btns">
+        <button class="m-btn cancel" onclick="closeModal('customModal')">Batal</button>
+        <button class="m-btn save" onclick="saveCustomTarget()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-box">
+      <div class="modal-title">Pengaturan</div>
+      
+      <div class="settings-section">Sistem & Efek</div>
+      <div class="setting-item">
+        <span class="setting-label">Suara Klik</span>
+        <div class="ios-switch" id="sw-sound" onclick="toggleSoundSetting()"></div>
+      </div>
+      <div class="setting-item">
+        <span class="setting-label">Getar (Vibrator)</span>
+        <div class="ios-switch active" id="sw-vibrate" onclick="toggleVibrateSetting()"></div>
+      </div>
+
+      <div class="settings-section">Fokus Ibadah & Data</div>
+      <div class="setting-item">
+        <span class="setting-label">Zen Mode</span>
+        <div class="ios-switch" id="sw-zen" onclick="toggleZenSetting()"></div>
+      </div>
+      <div class="setting-item" style="justify-content: center; background: transparent; border: none; padding: 10px 0;">
+         <button class="m-btn save" style="width: 100%;" onclick="openFullHistory()"><i class="bi bi-database me-2"></i> Lihat Database History (JSON)</button>
+      </div>
+
+      <div class="settings-section">Developer Info</div>
+      <div class="soc-list">
+        <a href="https://www.instagram.com/sahal_arbani413" target="_blank" class="soc-link"><i class="bi bi-instagram" style="margin-right: 8px;"></i> Instagram</a>
+        <a href="https://www.facebook.com/m.mahfudh.71" target="_blank" class="soc-link"><i class="bi bi-facebook" style="margin-right: 8px;"></i> Facebook</a>
+        <a href="https://www.tiktok.com/@sahal.arbani?_t=ZS-8vzU6bBIAzQ&_r=1" target="_blank" class="soc-link"><i class="bi bi-tiktok" style="margin-right: 8px;"></i> TikTok</a>
+        <a href="https://youtube.com/@sahalarbani" target="_blank" class="soc-link"><i class="bi bi-youtube" style="margin-right: 8px;"></i> YouTube</a>
+      </div>
+
+      <button class="m-btn cancel" style="width: 100%; margin-top: 20px;" onclick="closeModal('settingsModal')">Tutup</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="fullHistoryModal">
+    <div class="modal-box" style="display: flex; flex-direction: column; height: 80vh;">
+      <div class="modal-title">Database JSON Riwayat</div>
+      <div style="overflow-y: auto; flex: 1; text-align: left; background: var(--bg-color); border-radius: 14px; padding: 10px;">
+        <ol id="fullHistoryList" style="padding-left: 10px;"></ol>
+      </div>
+      <div class="modal-btns" style="margin-top: 15px;">
+        <button class="m-btn cancel" onclick="clearAllHistory()">Hapus Semua</button>
+        <button class="m-btn save" onclick="closeModal('fullHistoryModal')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="top-nav">
+    <div class="time" id="time">--:--:--</div>
+    <div style="display: flex; gap: 10px;">
+      <div class="icon-btn" id="lockBtn" onclick="toggleScreenLock()"><i class="bi bi-unlock-fill"></i></div>
+      <div class="icon-btn" onclick="openModal('settingsModal')"><i class="bi bi-gear-fill"></i></div>
+    </div>
+  </div>
+
+  <div class="preset-container">
+    <div class="preset-pill active" onclick="setMode('Subhanallah', 33, this)">Subhanallah (33)</div>
+    <div class="preset-pill" onclick="setMode('Alhamdulillah', 33, this)">Alhamdulillah (33)</div>
+    <div class="preset-pill" onclick="setMode('Allahu Akbar', 34, this)">Allahu Akbar (34)</div>
+    <div class="preset-pill" onclick="openCustomModal(this)">Atur Custom...</div>
+  </div>
+
+  <div class="center-container">
+    <div class="progress-ring" id="progressRing">
+      <button class="massive-btn" id="mainButton" onclick="incrementCount()">
+        <div class="counter" id="count">0</div>
+        <div class="target-label" id="targetDisplay">Target: 33</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn reset" onclick="manualReset()">Reset Manual</button>
+  </div>
+
+  <div class="history-card">
+    <div class="history-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h3 style="margin: 0;">Riwayat Terakhir</h3>
+      <button class="clear-history" onclick="clearRecentHistory()"><i class="bi bi-trash3-fill" style="margin-right: 4px;"></i> Bersihkan</button>
+    </div>
+    <ol id="recentHistoryList"></ol>
+  </div>
+
+  <audio id="clickSound" src="click.mp3" preload="auto"></audio>
+
+  <script src="state.js"></script>
+  <script src="ui.js"></script>
+  <script src="settings.js"></script>
+  <script src="core.js"></script>
+
+  <script>
+    window.addEventListener('message', function(event) {
+      const data = event.data;
+      if (data.type === 'SYNC_THEME') {
+        if (data.isDark) document.body.classList.add("night");
+        else document.body.classList.remove("night");
+      }
+      if (data.type === 'SYNC_COLOR') {
+        document.documentElement.style.setProperty('--accent-color', data.colorHex);
+        if (typeof updateDisplay === "function") updateDisplay();
+      }
+      if (data.type === 'INCREMENT_COUNT') {
+        if (typeof incrementCount === "function") incrementCount();
+      }
+    });
+
+    if (typeof updateTime === 'function') {
+      updateTime();
+      setInterval(updateTime, 1000);
+    }
+  </script>
+</body>
+</html>

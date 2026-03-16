@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kalender Hijriah & Masehi</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #F2F2F7; --bg-secondary: #FFFFFF; --text-main: #000000;
+      --text-muted: #8E8E93; --accent: #0A84FF; --danger: #FF3B30; --border: rgba(0,0,0,0.1);
+    }
+    body.night {
+      --bg-primary: #000000; --bg-secondary: #1C1C1E; --text-main: #FFFFFF;
+      --text-muted: #EBEBF5; --border: rgba(255,255,255,0.15);
+    }
+    body {
+      margin: 0; padding: 20px; background: var(--bg-primary); color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease; padding-bottom: 40px;
+    }
+    
+    .today-panel {
+      background: var(--bg-secondary); border-radius: 20px; padding: 20px; text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 0.5px solid var(--border);
+    }
+    .today-masehi { font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+    .today-hijri { font-size: 1rem; font-weight: 600; color: var(--accent); }
+    
+    .controls-wrapper {
+      background: var(--bg-secondary); border-radius: 20px; padding: 15px; margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 0.5px solid var(--border);
+    }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .month-year-picker {
+      background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-main);
+      padding: 8px 16px; border-radius: 12px; font-weight: 600; font-size: 1.05rem;
+      appearance: none; outline: none; text-align: center; width: 60%;
+    }
+    .nav-btn {
+      background: var(--bg-primary); border: 1px solid var(--border); color: var(--accent);
+      width: 40px; height: 40px; border-radius: 12px; font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .nav-btn:active { opacity: 0.7; }
+    
+    .adj-container { display: flex; align-items: center; justify-content: space-between; background: var(--bg-primary); border-radius: 12px; padding: 8px 12px; }
+    .adj-title { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+    .adj-controls { display: flex; align-items: center; gap: 10px; }
+    .adj-btn { background: transparent; border: none; color: var(--accent); font-size: 1.2rem; cursor: pointer; padding: 0 5px;}
+    .adj-value { font-weight: 700; font-size: 0.95rem; width: 40px; text-align: center; }
+
+    .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .day-name { text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; }
+    .day-name.sunday { color: var(--danger); }
+    
+    .cell {
+      background: var(--bg-secondary); border-radius: 12px; padding: 8px 2px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05); min-height: 65px; position: relative; border: 1px solid transparent;
+    }
+    .cell.empty { background: transparent; box-shadow: none; border: none; }
+    
+    .cell.today { border-color: var(--accent); background: rgba(10, 132, 255, 0.05); }
+    .cell.today .gregorian { color: var(--accent); }
+    
+    .cell.holiday { border-color: var(--danger); }
+    .cell.holiday .gregorian { color: var(--danger); }
+    .holiday-dot { width: 4px; height: 4px; background: var(--danger); border-radius: 50%; position: absolute; top: 4px; right: 4px; }
+    
+    .gregorian { font-size: 1.1rem; font-weight: 700; line-height: 1; margin-bottom: 6px; color: var(--text-main); }
+    .hijri { font-size: 1.1rem; font-weight: 600; color: var(--accent); text-align: center; line-height: 1; font-family: 'Amiri', serif; }
+    
+    .holiday-panel {
+      background: var(--bg-secondary); border-radius: 20px; padding: 20px; margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 0.5px solid var(--border);
+    }
+    .holiday-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; color: var(--text-main); }
+    .holiday-list { list-style: none; padding: 0; margin: 0; }
+    .holiday-item { display: flex; flex-direction: column; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+    .holiday-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .h-date { font-size: 0.8rem; font-weight: 700; margin-bottom: 2px; display: flex; align-items: center;}
+    .h-name { font-size: 0.85rem; color: var(--text-muted); padding-left: 24px; }
+  </style>
+</head>
+<body class="night">
+
+  <div class="today-panel">
+    <div class="today-masehi" id="todayCE">Memuat...</div>
+    <div class="today-hijri" id="todayHijr">Memuat...</div>
+  </div>
+
+  <div class="controls-wrapper">
+    <div class="header">
+      <button class="nav-btn" onclick="changeMonth(-1)"><i class="bi bi-chevron-left"></i></button>
+      <input type="month" id="monthPicker" class="month-year-picker" onchange="renderCalendar()">
+      <button class="nav-btn" onclick="changeMonth(1)"><i class="bi bi-chevron-right"></i></button>
+    </div>
+    
+    <div class="adj-container">
+      <div class="adj-title"><i class="bi bi-moon-stars-fill me-1"></i> Koreksi NU/Hilal</div>
+      <div class="adj-controls">
+        <button class="adj-btn" onclick="changeAdj(-1)"><i class="bi bi-dash-circle-fill"></i></button>
+        <div class="adj-value" id="adjDisplay">0</div>
+        <button class="adj-btn" onclick="changeAdj(1)"><i class="bi bi-plus-circle-fill"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" id="dayNames">
+    <div class="day-name sunday">Ahad</div><div class="day-name">Sen</div><div class="day-name">Sel</div>
+    <div class="day-name">Rab</div><div class="day-name">Kam</div><div class="day-name">Jum</div><div class="day-name">Sab</div>
+  </div>
+  <div class="grid" id="calendarGrid"></div>
+
+  <div class="holiday-panel" id="holidayPanel" style="display: none;">
+    <div class="holiday-title"><i class="bi bi-calendar-event-fill me-2" style="color: var(--accent);"></i> Hari Penting & Libur</div>
+    <ul class="holiday-list" id="holidayList"></ul>
+  </div>
+
+  <script>
+    let currentDate = new Date();
+    let hijriAdjustment = parseInt(localStorage.getItem('hijriAdj')) || 0;
+    let holidayDates = []; 
+    let eventsList = [];
+    
+    // Mesin Acara Islam Otomatis
+    const islamicEvents = {
+      "1-1": "Tahun Baru Islam (1 Muharram)", "1-10": "Puasa Asyura (10 Muharram)",
+      "7-27": "Isra' Mi'raj (27 Rajab)", "8-15": "Nisfu Sya'ban (15 Sya'ban)",
+      "9-1": "Awal Ramadhan (1 Ramadhan)", "9-17": "Nuzulul Qur'an (17 Ramadhan)",
+      "10-1": "Hari Raya Idul Fitri (1 Syawal)", "12-9": "Puasa Arafah (9 Dzulhijjah)",
+      "12-10": "Hari Raya Idul Adha (10 Dzulhijjah)"
+    };
+    
+    document.getElementById('adjDisplay').innerText = hijriAdjustment > 0 ? `+${hijriAdjustment}` : hijriAdjustment;
+
+    window.addEventListener('message', function(event) {
+      if (event.data.type === 'SYNC_THEME') {
+        if (event.data.isDark) document.body.classList.add("night");
+        else document.body.classList.remove("night");
+      }
+      if (event.data.type === 'SYNC_COLOR') {
+        document.documentElement.style.setProperty('--accent', event.data.colorHex);
+      }
+    });
+    window.parent.postMessage({ type: 'REQUEST_SYNC' }, '*');
+
+    function changeAdj(val) {
+      hijriAdjustment += val;
+      if(hijriAdjustment > 3) hijriAdjustment = 3;
+      if(hijriAdjustment < -3) hijriAdjustment = -3;
+      document.getElementById('adjDisplay').innerText = hijriAdjustment > 0 ? `+${hijriAdjustment}` : hijriAdjustment;
+      localStorage.setItem('hijriAdj', hijriAdjustment);
+      renderCalendar(); fetchTodayAPI(); 
+    }
+
+    async function fetchTodayAPI() {
+      try {
+        const res = await fetch(`https://api.myquran.com/v3/cal/today?adj=${hijriAdjustment}`);
+        const json = await res.json();
+        if(json.status) {
+          const opt = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+          document.getElementById('todayCE').innerText = new Date().toLocaleDateString('id-ID', opt);
+          document.getElementById('todayHijr').innerText = `${json.data.hijr.day} ${json.data.hijr.monthName} ${json.data.hijr.year} H`;
+        }
+      } catch(e) {
+        document.getElementById('todayCE').innerText = "Gagal memuat API";
+      }
+    }
+
+    function getArabicHijriDay(dateObj, adjDays) {
+      const adjDate = new Date(dateObj.getTime() + (adjDays * 24 * 60 * 60 * 1000));
+      return new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { day: 'numeric' }).format(adjDate);
+    }
+
+    function getIslamicDateNumeric(dateObj, adjDays) {
+      try {
+        const adjDate = new Date(dateObj.getTime() + (adjDays * 24 * 60 * 60 * 1000));
+        const parts = new Intl.DateTimeFormat('en-US-u-ca-islamic', { day: 'numeric', month: 'numeric' }).formatToParts(adjDate);
+        let hDay = 1, hMonth = 1;
+        parts.forEach(p => {
+           if(p.type === 'day') hDay = parseInt(p.value, 10);
+           if(p.type === 'month') hMonth = parseInt(p.value, 10);
+        });
+        return { hDay, hMonth };
+      } catch(e) { return { hDay: 0, hMonth: 0 }; }
+    }
+
+    async function renderCalendar() {
+      const picker = document.getElementById('monthPicker');
+      if (picker.value) {
+        const parts = picker.value.split('-');
+        currentDate.setFullYear(parseInt(parts[0]), parseInt(parts[1]) - 1, 1);
+      }
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      picker.value = `${year}-${String(month + 1).padStart(2, '0')}`;
+
+      // Reset Data Libur
+      holidayDates = []; eventsList = [];
+      const hList = document.getElementById('holidayList');
+      const hPanel = document.getElementById('holidayPanel');
+      hList.innerHTML = '<li class="holiday-item"><span class="h-name" style="padding-left:0;">Memuat data hari penting...</span></li>';
+      hPanel.style.display = 'block';
+
+      try {
+        const res = await fetch(`https://dayoffapi.vercel.app/api?month=${month + 1}&year=${year}`);
+        const dataLibur = await res.json();
+        if (Array.isArray(dataLibur)) {
+          dataLibur.forEach(libur => {
+            const tgl = libur.tanggal || libur.holiday_date;
+            const ket = libur.keterangan || libur.holiday_name;
+            if(tgl && libur.is_cuti !== true) { 
+              holidayDates.push(tgl); eventsList.push({ date: tgl, name: ket, isHoliday: true, isIslamic: false });
+            } else if (tgl && libur.is_cuti === true) {
+              eventsList.push({ date: tgl, name: "Cuti Bersama: " + ket, isHoliday: false, isIslamic: false });
+            }
+          });
+        }
+      } catch(e) {
+        try {
+           const res2 = await fetch(`https://api-harilibur.vercel.app/api?month=${month + 1}&year=${year}`);
+           const dataLibur2 = await res2.json();
+           if (Array.isArray(dataLibur2)) {
+             dataLibur2.forEach(libur => {
+                const tgl = libur.holiday_date; const ket = libur.holiday_name;
+                if(tgl) { holidayDates.push(tgl); eventsList.push({ date: tgl, name: ket, isHoliday: true, isIslamic: false }); }
+             });
+           }
+        } catch(err) {}
+      }
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const todayObj = new Date();
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div class="cell empty"></div>`;
+
+      for (let i = 1; i <= daysInMonth; i++) {
+        const loopDate = new Date(year, month, i);
+        const hijriArabNumber = getArabicHijriDay(loopDate, hijriAdjustment);
+        const { hDay, hMonth } = getIslamicDateNumeric(loopDate, hijriAdjustment);
+        const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        
+        // Kalkulasi Acara Islam secara Offline
+        const eventKey = `${hMonth}-${hDay}`;
+        if (islamicEvents[eventKey]) {
+           const eventName = islamicEvents[eventKey];
+           const exists = eventsList.find(e => e.date === dateString && e.name.includes(eventName.split(" ")[0]));
+           if (!exists) eventsList.push({ date: dateString, name: eventName, isHoliday: false, isIslamic: true });
+        }
+        
+        let isToday = false;
+        if (loopDate.getDate() === todayObj.getDate() && loopDate.getMonth() === todayObj.getMonth() && loopDate.getFullYear() === todayObj.getFullYear()) {
+          isToday = true;
+        }
+        
+        let isHoliday = holidayDates.includes(dateString) || loopDate.getDay() === 0; 
+        let classes = "cell";
+        if (isToday) classes += " today";
+        if (isHoliday) classes += " holiday";
+
+        grid.innerHTML += `
+          <div class="${classes}">
+            ${isHoliday && !isToday && loopDate.getDay() !== 0 ? '<div class="holiday-dot"></div>' : ''}
+            <span class="gregorian">${i}</span>
+            <span class="hijri">${hijriArabNumber}</span>
+          </div>
+        `;
+      }
+      
+      // Render Event List
+      hList.innerHTML = '';
+      if (eventsList.length > 0) {
+        hPanel.style.display = 'block';
+        eventsList.sort((a, b) => new Date(a.date) - new Date(b.date));
+        eventsList.forEach(ev => {
+          const tglIndo = new Intl.DateTimeFormat('id-ID', {day:'numeric', month:'long', year:'numeric'}).format(new Date(ev.date));
+          let icon = ev.isHoliday ? '<i class="bi bi-calendar-check-fill text-danger me-2" style="color: var(--danger);"></i>' : 
+                     (ev.isIslamic ? '<i class="bi bi-moon-stars-fill me-2" style="color: var(--accent);"></i>' : '<i class="bi bi-calendar-event me-2" style="color: var(--text-muted);"></i>');
+          let textColor = ev.isHoliday ? 'var(--danger)' : 'var(--text-main)';
+
+          hList.innerHTML += `
+            <li class="holiday-item">
+              <span class="h-date" style="color: ${textColor};">${icon}${tglIndo}</span>
+              <span class="h-name">${ev.name}</span>
+            </li>
+          `;
+        });
+      } else {
+        hPanel.style.display = 'none';
+      }
+    }
+
+    function changeMonth(step) {
+      currentDate.setMonth(currentDate.getMonth() + step);
+      const picker = document.getElementById('monthPicker');
+      picker.value = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+      renderCalendar();
+    }
+
+    fetchTodayAPI(); renderCalendar();
+  </script>
+</body>
+</html>
