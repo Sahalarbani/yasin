@@ -1,5 +1,5 @@
 // Ganti versi ini (misal ke v2, v3) SETIAP KALI lu nge-push perubahan besar ke GitHub!
-const CACHE_NAME = 'alquran-cache-v3';
+const CACHE_NAME = 'alquran-cache-v4';
 
 // Daftarkan semua file yang wajib di-cache agar bisa offline dan fast-loading
 const urlsToCache = [
