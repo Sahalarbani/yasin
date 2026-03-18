@@ -12,8 +12,6 @@ let lastActivePill = null;
 // ====== PENGATURAN ======
 let isSoundOn = localStorage.getItem("isSoundOn") === "false" ? false : true; 
 let isVibrate = localStorage.getItem("isVibrate") === "false" ? false : true;
-let isNightMode = localStorage.getItem("isNightMode") === "false" ? false : true;
-let savedHue = localStorage.getItem("accentHue") || "210";
 let isZenMode = false;
 let isLocked = false; 
 
@@ -27,4 +25,3 @@ const customInput = document.getElementById("customInput");
 const customNameInput = document.getElementById("customNameInput");
 const recentHistoryList = document.getElementById("recentHistoryList");
 const fullHistoryList = document.getElementById("fullHistoryList");
-

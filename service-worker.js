@@ -1,5 +1,5 @@
-// Ganti versi ini (misal ke v2, v3) SETIAP KALI lu nge-push perubahan besar ke GitHub!
-const CACHE_NAME = 'alquran-cache-v2';
+// Ganti versi ini SETIAP KALI lu nge-push perubahan besar ke GitHub!
+const CACHE_NAME = 'alquran-cache-v6';
 
 // Daftarkan semua file yang wajib di-cache agar bisa offline dan fast-loading
 const urlsToCache = [
@@ -20,7 +20,7 @@ const urlsToCache = [
 
 // 1. Fase Install: Sedot semua file dan paksa aktif
 self.addEventListener('install', event => {
-  self.skipWaiting(); // Instruksi krusial: Jangan nunggu, langsung aktifkan Service Worker baru!
+  self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
@@ -42,12 +42,12 @@ self.addEventListener('activate', event => {
       );
     })
   );
-  self.clients.claim(); // Ambil alih kontrol semua window/webview secepatnya
+  self.clients.claim(); 
 });
 
 // 3. Fase Fetch: Strategi Stale-While-Revalidate (Super Cepat + Selalu Update)
 self.addEventListener('fetch', event => {
-  // Hanya tangani request HTTP/HTTPS (hindari error jika WebView memanggil skema aneh)
+  // Hanya tangani request HTTP/HTTPS
   if (!event.request.url.startsWith('http')) return;
 
   event.respondWith(
@@ -63,8 +63,6 @@ self.addEventListener('fetch', event => {
         console.error('Network gagal, menggunakan murni cache', err);
       });
       
-      // Kembalikan cache LANGSUNG jika ada (agar tidak lemot), 
-      // jika tidak ada, tunggu hasil fetch dari network
       return cachedResponse || fetchPromise;
     })
   );

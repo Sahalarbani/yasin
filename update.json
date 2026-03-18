@@ -1,27 +1,22 @@
 {
   "created_by": "Sahal Arbani",
-  "version": "4.0.0",
-  "tanggal_update": "17 Maret 2026",
+  "version": "3.3.2",
+  "apk_version": 3,
+  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/v3.3.2/alquran_pro.apk",
+  "tanggal_update": "18 Maret 2026",
   "fitur_baru": [
-    "Evolusi Super App: Integrasi Jadwal Sholat Native SPA tanpa loading pindah halaman.",
-    "Kalender Dual-Engine: Kalender Masehi & Hijriah (Angka Arab murni) dalam satu layar.",
-    "Sistem Libur Cerdas: Menampilkan Hari Libur Nasional & Acara Islam secara otomatis.",
-    "Fitur Koreksi Hilal: Sinkronisasi tanggal Hijriah manual (+1/-1 hari) untuk jamaah NU/Muhammadiyah.",
-    "Smart Bridge Android: Integrasi tombol volume fisik HP untuk kendali Tasbih Digital via Sketchware.",
-    "Zero-Latency City Search: Pencarian kota seluruh Indonesia super instan via Bottom Sheet.",
-    "PWA Auto-Update: Arsitektur Service Worker baru yang mematikan keharusan 'Clear Data' saat ada pembaruan.",
-    "Developer Mode: Opsi untuk melakukan pengujian suara Azan Subuh dan Azan lainnya."
+    "Native Background Adzan: Alarm adzan dieksekusi murni di level sistem OS secara background.",
+    "Smart OTA Update: Sistem pembaruan aplikasi mandiri tanpa bergantung pada Play Store.",
+    "Kalender Dual-Engine: Kalender Masehi & Hijriah dalam satu layar interaktif.",
+    "Zero-Latency City Search: Pencarian kota seluruh Indonesia super instan via Bottom Sheet."
   ],
   "petunjuk": [
-    "Gunakan tombol (+/-) di menu Kalender untuk mengoreksi tanggal Hijriah sesuai sidang Isbat pemerintah.",
-    "Saat berada di halaman Tasbih, cukup tekan tombol Volume HP lu untuk berdzikir tanpa perlu menatap layar.",
-    "Ubah warna aksen di Pengaturan, dan seluruh elemen aplikasi (termasuk Tasbih & Kalender) akan tersinkronisasi detik itu juga.",
-    "Biarkan aplikasi tetap terbuka untuk mendengarkan kumandang Azan otomatis sesuai jadwal kota lu."
+    "Jika muncul notifikasi update, klik tombol dan sistem akan mengunduh di latar belakang.",
+    "Saat berada di halaman Tasbih, gunakan tombol Volume fisik HP untuk berdzikir.",
+    "Ubah warna aksen di Pengaturan, seluruh elemen (termasuk Tasbih) akan tersinkronisasi."
   ],
   "bug": [
-    "Memperbaiki bug bahasa (Tuesday menjadi Selasa) dengan Native JS Locale.",
-    "Menumpas bug Engine WebView yang keliru menampilkan teks bulan Masehi pada kalender Hijriah.",
-    "Mengakali Autoplay Policy Android yang sebelumnya memblokir suara Azan agar bisa berbunyi otomatis.",
-    "Memperbaiki sistem Cache aplikasi sehingga update terbaru dari GitHub langsung terbaca tanpa nyangkut."
+    "Menyelesaikan Race Condition pada sinkronisasi warna Iframe Tasbih Digital.",
+    "Menumpas bug Engine WebView yang menahan cache pop-up pembaruan aplikasi."
   ]
 }

@@ -99,7 +99,6 @@
     .ios-select { background-color: var(--ios-bg-secondary); color: var(--ios-text-main); border: none; border-radius: 12px; padding: 14px 16px; width: 100%; font-size: 1rem; appearance: none; }
     .ios-select:focus { outline: none; }
 
-    /* Switch iOS Native Style */
     .ios-switch { position: relative; width: 46px; height: 26px; background: #D1D1D6; border-radius: 26px; cursor: pointer; transition: background 0.3s; }
     body.dark-mode .ios-switch { background: #39393D; }
     .ios-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; background: #FFF; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.32, 1.2); }
@@ -297,7 +296,7 @@
       <div class="ios-list-item d-flex justify-content-between align-items-center">
         <div>
           <span class="fw-bold d-block">Azan Otomatis</span>
-          <span style="font-size: 0.75rem; color: var(--ios-text-muted);">Bunyikan audio saat masuk waktu</span>
+          <span style="font-size: 0.75rem; color: var(--ios-text-muted);">Notifikasi & Audio Latar Belakang</span>
         </div>
         <div class="ios-switch" id="sw-azan" onclick="toggleAzanAuto()"></div>
       </div>
@@ -320,27 +319,26 @@
     </div>
 
     <div class="ios-list-group mb-4">
-      <button class="ios-list-item" onclick="showFloatingModal()">
+      <button class="ios-list-item" onclick="checkAutoUpdate(true)">
         <span class="fw-bold">Informasi Pembaruan</span>
         <i class="bi bi-info-circle fs-5" style="color: var(--ios-blue);"></i>
       </button>
     </div>
 
-    <div class="settings-section" style="text-align: left; font-size: 13px; font-weight: 700; color: var(--ios-text-muted); text-transform: uppercase; margin: 20px 0 8px 5px; letter-spacing: 0.5px;">Developer Mode: Simulasi Waktu</div>
+    <div class="settings-section" style="text-align: left; font-size: 13px; font-weight: 700; color: var(--ios-text-muted); text-transform: uppercase; margin: 20px 0 8px 5px; letter-spacing: 0.5px;">Developer Mode: Simulasi Alarm</div>
     <div class="ios-list-group mb-4" style="padding: 16px;">
       <div class="mb-3">
-        <label class="fw-bold" style="font-size: 0.85rem; color: var(--ios-text-main);">Pilih Pengujian</label>
+        <label class="fw-bold" style="font-size: 0.85rem; color: var(--ios-text-main);">Pilih Eksekusi</label>
         <select id="simSholat" class="ios-select mt-2" style="background-color: var(--ios-gray-fill);">
-          <option value="subuh">Subuh (Audio Azan Subuh)</option>
-          <option value="dzuhur">Dzuhur / Ashar / Maghrib / Isya (Audio Lainnya)</option>
-          <option value="imsak">Imsak / Terbit / Dhuha (Murni Logika, No Audio)</option>
+          <option value="subuh">Alarm Subuh (Audio Subuh)</option>
+          <option value="dzuhur">Alarm Dzuhur (Audio Lainnya)</option>
         </select>
       </div>
       <div class="mb-3">
-        <label class="fw-bold" style="font-size: 0.85rem; color: var(--ios-text-main);">Pemicu Waktu Real-Time (HH:MM)</label>
+        <label class="fw-bold" style="font-size: 0.85rem; color: var(--ios-text-main);">Jam Pemicu (Format 24 Jam - HH:MM)</label>
         <input type="time" id="simTime" class="ios-search-bar mt-2" style="background-color: var(--ios-gray-fill);">
       </div>
-      <button class="ios-btn-text w-100 py-2 fw-bold" style="background-color: var(--ios-blue); color: white; border-radius: 10px;" onclick="startSimulation()">Siagakan Simulasi</button>
+      <button class="ios-btn-text w-100 py-2 fw-bold" style="background-color: var(--ios-blue); color: white; border-radius: 10px;" onclick="testNativeAlarm()">Test Alarm Background</button>
       <div id="simStatus" class="mt-3 text-center fw-bold" style="font-size: 0.8rem; color: var(--ios-warning);"></div>
     </div>
 
@@ -388,8 +386,6 @@
 </div>
 
 <audio id="audioPlayer" hidden></audio>
-<audio id="azanSubuh" src="azan-subuh.mp3" preload="auto" hidden></audio>
-<audio id="azanLainnya" src="azan-lainnya.mp3" preload="auto" hidden></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
@@ -399,14 +395,7 @@
 <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js').then(reg => {
-    reg.addEventListener('updatefound', () => {
-      const newWorker = reg.installing;
-      newWorker.addEventListener('statechange', () => {
-        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-          showFloatingModal(); 
-        }
-      });
-    });
+    reg.update();
   });
 }
 
@@ -432,56 +421,38 @@ function toggleAzanAuto() {
   isAzanAuto = !isAzanAuto;
   localStorage.setItem("isAzanAuto", isAzanAuto);
   initAzanSetting();
-}
-
-function triggerAzan(sholatName) {
-  if (!isAzanAuto) return;
-  
-  // Filter anti bug: Imsak, Terbit, Dhuha tidak boleh azan
-  if (['imsak', 'terbit', 'dhuha'].includes(sholatName)) {
-    console.log('Logika aman: Tidak ada azan untuk', sholatName);
-    return;
-  }
-  
-  if (sholatName === 'subuh') {
-    document.getElementById('azanSubuh').play().catch(e=>console.log('Autoplay ditahan'));
-  } else {
-    document.getElementById('azanLainnya').play().catch(e=>console.log('Autoplay ditahan'));
+  if (isAzanAuto) {
+     syncAlarmsToNative();
   }
 }
 
-let simInterval = null;
-function startSimulation() {
+function syncAlarmsToNative() {
+  if (typeof AndroidBridge === 'undefined' || !isAzanAuto) return;
+  const waktuWajib = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
+  waktuWajib.forEach(sholatName => {
+    if (activeJadwal[sholatName]) {
+      const timeParts = activeJadwal[sholatName].split(':');
+      AndroidBridge.setAdzanAlarm(sholatName, parseInt(timeParts[0], 10), parseInt(timeParts[1], 10));
+    }
+  });
+}
+
+function testNativeAlarm() {
   const timeVal = document.getElementById('simTime').value;
   const sholatVal = document.getElementById('simSholat').value;
-  
-  if (!timeVal) {
-    document.getElementById('simStatus').innerText = "Setel waktu dulu!";
-    return;
+  if (!timeVal) { document.getElementById('simStatus').innerText = "Isi jam pemicunya dulu!"; return; }
+  if (typeof AndroidBridge !== 'undefined') {
+    const parts = timeVal.split(':');
+    AndroidBridge.setAdzanAlarm(sholatVal, parseInt(parts[0], 10), parseInt(parts[1], 10));
+    document.getElementById('simStatus').innerText = `BERHASIL! Alarm NATIVE disetel ke jam ${timeVal}. Matikan layar HP lu sekarang!`;
+  } else {
+    document.getElementById('simStatus').innerText = "GAGAL: AndroidBridge tidak ditemukan.";
   }
-  
-  document.getElementById('simStatus').innerText = `Menunggu jam ${timeVal} untuk tes eksekusi ${sholatVal.toUpperCase()}...`;
-  
-  if (simInterval) clearInterval(simInterval);
-  
-  simInterval = setInterval(() => {
-    const now = moment().tz('Asia/Jakarta');
-    const currentHM = now.format('HH:mm');
-    const currentS = now.format('ss');
-    
-    if (currentHM === timeVal && currentS === '00') {
-      clearInterval(simInterval);
-      document.getElementById('simStatus').innerText = `Simulasi ${sholatVal} Dieksekusi Sukses!`;
-      triggerAzan(sholatVal);
-    }
-  }, 1000);
 }
 
 function broadcastToIframe(frameId, type, payload) {
   const frame = document.getElementById(frameId);
-  if (frame && frame.contentWindow) {
-    frame.contentWindow.postMessage({ type: type, ...payload }, '*');
-  }
+  if (frame && frame.contentWindow) { frame.contentWindow.postMessage({ type: type, ...payload }, '*'); }
 }
 
 function triggerTasbihIncrement() { broadcastToIframe('tasbihFrame', 'INCREMENT_COUNT', {}); }
@@ -495,9 +466,7 @@ function syncToIframe() {
   broadcastToIframe('kalenderFrame', 'SYNC_COLOR', { colorHex: savedColor });
 }
 
-window.addEventListener('message', (e) => {
-  if (e.data && e.data.type === 'REQUEST_SYNC') syncToIframe();
-});
+window.addEventListener('message', (e) => { if (e.data && e.data.type === 'REQUEST_SYNC') syncToIframe(); });
 
 function initCustomColor() {
   const defaultColor = '#0A84FF';
@@ -743,19 +712,50 @@ async function loadHadroh() {
 }
 
 function closeFloatingModal() { const m = document.getElementById("floatingModal"); if (m) m.remove(); }
-async function showFloatingModal() {
+
+// --- ARSITEKTUR OTA UPDATE TINGKAT DEWA ---
+async function checkAutoUpdate(isManual = false) {
+  try {
+    const data = await (await fetch("update.json", { cache: "no-store" })).json();
+    let currentNativeVersion = 0;
+    
+    // 1. Tanya langsung ke otak Android
+    if (typeof AndroidBridge !== 'undefined') {
+      currentNativeVersion = AndroidBridge.getNativeVersionCode();
+    } else {
+      // Bypass untuk testing di browser biasa
+      currentNativeVersion = parseInt(localStorage.getItem("lastAppVersion") || "0");
+    }
+
+    // 2. Fail-Safe: Cek apakah butuh update atau dipaksa manual
+    if (currentNativeVersion < data.apk_version || isManual) {
+      showUpdateModal(data);
+    } else if (isManual) {
+      // Kalau user klik tombol tapi versi udah terbaru
+      alert("Aplikasi Anda sudah versi terbaru (" + data.version + ")");
+    }
+  } catch (e) {
+      if(isManual) alert("Gagal mengecek pembaruan server.");
+  }
+}
+
+async function showUpdateModal(data) {
   try {
     closeFloatingModal();
-    const htmlText = await (await fetch("update-modal.html")).text();
+    const htmlText = await (await fetch("update-modal.html", { cache: "no-store" })).text();
     if (htmlText.toLowerCase().includes("file not found")) return;
     const tempDiv = document.createElement("div"); tempDiv.innerHTML = htmlText.trim(); document.body.appendChild(tempDiv);
     
-    const data = await (await fetch("update.json")).json();
     document.getElementById("floatingContent").innerHTML = `
       <div style="text-align: center; margin-bottom: 24px;">
-        <span style="background-color: var(--ios-blue); color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">Versi ${data.version}</span>
+        <span style="background-color: var(--ios-blue); color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">Versi Baru: ${data.version}</span>
         <div style="font-size: 0.8rem; color: var(--ios-text-muted); margin-top: 8px;">Diperbarui: ${data.tanggal_update}</div>
       </div>
+      
+      <button id="btnDownloadUpdate" onclick="executeNativeUpdate('${data.apk_url}', ${data.apk_version})" style="background-color: var(--ios-blue); color: white; border: none; border-radius: 12px; padding: 14px; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.3);">
+        <i class="bi bi-cloud-arrow-down-fill me-2"></i> Update Sekarang
+      </button>
+
       <h6 style="font-weight: 700; color: var(--ios-green); font-size: 0.95rem; margin-bottom: 10px;"><i class="bi bi-stars me-1"></i> Peningkatan Fitur</h6>
       <ul style="font-size: 0.85rem; color: var(--ios-text-main); padding-left: 20px; margin-bottom: 20px;">${data.fitur_baru.map(f => `<li style="margin-bottom: 6px;">${f}</li>`).join("")}</ul>
       <h6 style="font-weight: 700; color: var(--ios-warning); font-size: 0.95rem; margin-bottom: 10px;"><i class="bi bi-journal-text me-1"></i> Petunjuk Penggunaan</h6>
@@ -765,6 +765,19 @@ async function showFloatingModal() {
     `;
     const canvas = bootstrap.Offcanvas.getInstance(document.getElementById('settingsSheet')); if(canvas) canvas.hide();
   } catch (err) {}
+}
+
+function executeNativeUpdate(url, version) {
+  const btn = document.getElementById('btnDownloadUpdate');
+  btn.innerHTML = `<i class="bi bi-hourglass-split me-2"></i> Mengunduh... Lihat Status Bar`;
+  btn.style.backgroundColor = 'var(--ios-warning)';
+  btn.disabled = true;
+
+  if (typeof AndroidBridge !== 'undefined') {
+    AndroidBridge.triggerUpdate(url, version);
+  } else {
+    window.open(url);
+  }
 }
 
 // --- LOGIKA JADWAL SHOLAT SPA NATIVE ---
@@ -797,6 +810,7 @@ async function initJadwalSholat() {
     if (data.status) {
       activeJadwal = data.data.jadwal;
       urutanSholat.forEach(s => { document.getElementById(`time-${s}`).textContent = activeJadwal[s]; });
+      syncAlarmsToNative();
       calculateCountdown();
     }
   } catch (e) { document.getElementById('sholatCountdown').textContent = "Gagal memuat API Jadwal."; }
@@ -827,11 +841,6 @@ function calculateCountdown() {
 
   urutanSholat.forEach(s => document.getElementById(`row-${s}`).classList.remove('highlight'));
   document.getElementById(`row-${nextName}`).classList.add('highlight');
-
-  // Trigger Terisolasi (Diarahkan ke fungsi triggerAzan)
-  if (jam === '00' && menit === '00' && detik === '00') {
-    triggerAzan(nextName);
-  }
 }
 
 document.getElementById('locationSheet').addEventListener('show.bs.offcanvas', async () => {
@@ -870,6 +879,11 @@ function saveCity(id, name) {
 window.addEventListener("load", () => {
   loadSurahList();
   initAzanSetting();
+  checkAutoUpdate(false); // Mode background saat app dibuka
+  
+  // FAIL-SAFE SINKRONISASI TASBIH (Coba tembak ulang warna setelah 0.5 detik)
+  setTimeout(syncToIframe, 500); 
+
   try { initCustomColor(); } catch (e) {}
 });
 </script>

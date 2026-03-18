@@ -102,11 +102,6 @@ function setMode(name, newTarget, element) {
 }
 
 function init() {
-  if(isNightMode) document.body.classList.add("night"); else document.body.classList.remove("night");
-  document.documentElement.style.setProperty('--accent-color', `hsl(${savedHue}, 100%, 50%)`);
-  document.getElementById("hueSlider").value = savedHue;
-  
-  updateSwitchUI("sw-theme", isNightMode);
   updateSwitchUI("sw-sound", isSoundOn);
   updateSwitchUI("sw-vibrate", isVibrate);
   
@@ -121,7 +116,7 @@ function init() {
   });
   
   updateDisplay();
-  updateRecentHistoryUI(); // Render layar awal
+  updateRecentHistoryUI();
 }
 
 init();
