@@ -3,19 +3,22 @@
   "version": "4.2.2",
   "apk_version": 4,
   "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/4.2.2/alquran_pro_v4.2.2.apk",
-  "tanggal_update": "18 Maret 2026",
+  "tanggal_update": "19 Maret 2026",
   "fitur_baru": [
-    "Native Background Adzan: Alarm adzan dieksekusi murni di level sistem OS secara background.",
-    "Smart OTA Update: Sistem pembaruan aplikasi mandiri tanpa bergantung pada Play Store.",
-    "Kalender Dual-Engine: Kalender Masehi & Hijriah dalam satu layar interaktif.",
-    "Zero-Latency City Search: Pencarian kota seluruh Indonesia super instan via Bottom Sheet."
+    "Internal Async Downloader: Mesin pengunduh kustom anti-firewall OS (MIUI/HyperOS) yang mampu menembus HTTP 302 Redirect secara native.",
+    "Heuristic APK Validation: Sistem pertahanan siber yang secara otomatis membedah integritas biner file unduhan untuk memblokir instalasi file palsu atau korup.",
+    "Smart Notification Threading: Indikator persentase unduhan real-time di panel notifikasi dengan logika throttling yang sangat ringan untuk RAM.",
+    "Dynamic Update UI: Antarmuka pembaruan kini membandingkan versi memori lokal dan server secara real-time untuk mencegah unduhan ganda.",
+    "Native Background Adzan: Alarm adzan dieksekusi murni di level sistem OS secara background tanpa menguras baterai."
   ],
   "petunjuk": [
-    "Jika muncul notifikasi update, klik tombol dan sistem akan mengunduh di latar belakang.",
-    "Saat berada di halaman Tasbih, gunakan tombol Volume fisik HP untuk berdzikir.",
-    "Ubah warna aksen di Pengaturan, seluruh elemen (termasuk Tasbih) akan tersinkronisasi."
+    "Saat melakukan update aplikasi, pastikan izin Notifikasi telah diaktifkan agar progres pengunduhan muncul di status bar.",
+    "Saat berada di halaman Tasbih, gunakan tombol Volume fisik HP untuk berdzikir tanpa harus melihat layar.",
+    "Ubah warna aksen di Pengaturan, seluruh elemen (termasuk Tasbih dan Kalender) akan otomatis tersinkronisasi."
   ],
   "bug": [
+    "Menumpas Silent Drop (gagal unduh senyap) akibat pemblokiran ketat dari mesin DownloadManager bawaan Android 14.",
+    "Pembersihan artefak arsitektur lama (BroadcastReceiver) untuk efisiensi beban kerja CPU dan manajemen memori.",
     "Menyelesaikan Race Condition pada sinkronisasi warna Iframe Tasbih Digital.",
     "Menumpas bug Engine WebView yang menahan cache pop-up pembaruan aplikasi."
   ]
