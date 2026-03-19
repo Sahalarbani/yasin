@@ -1,15 +1,12 @@
 {
   "created_by": "Sahal Arbani",
-  "version": "4.2.2",
+  "version": "5.2.2",
   "apk_version": 4,
   "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/4.2.2/alquran_pro_v4.2.2.apk",
   "tanggal_update": "19 Maret 2026",
   "fitur_baru": [
-    "Internal Async Downloader: Mesin pengunduh kustom anti-firewall OS (MIUI/HyperOS) yang mampu menembus HTTP 302 Redirect secara native.",
-    "Heuristic APK Validation: Sistem pertahanan siber yang secara otomatis membedah integritas biner file unduhan untuk memblokir instalasi file palsu atau korup.",
-    "Smart Notification Threading: Indikator persentase unduhan real-time di panel notifikasi dengan logika throttling yang sangat ringan untuk RAM.",
-    "Dynamic Update UI: Antarmuka pembaruan kini membandingkan versi memori lokal dan server secara real-time untuk mencegah unduhan ganda.",
-    "Native Background Adzan: Alarm adzan dieksekusi murni di level sistem OS secara background tanpa menguras baterai."
+    " + add fitur holiday + perayaan ",
+    " + new ui color calender"
   ],
   "petunjuk": [
     "Saat melakukan update aplikasi, pastikan izin Notifikasi telah diaktifkan agar progres pengunduhan muncul di status bar.",
@@ -21,5 +18,4 @@
     "Pembersihan artefak arsitektur lama (BroadcastReceiver) untuk efisiensi beban kerja CPU dan manajemen memori.",
     "Menyelesaikan Race Condition pada sinkronisasi warna Iframe Tasbih Digital.",
     "Menumpas bug Engine WebView yang menahan cache pop-up pembaruan aplikasi."
-  ]
 }
