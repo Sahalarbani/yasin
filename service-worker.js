@@ -1,5 +1,5 @@
 // Ganti versi ini SETIAP KALI lu nge-push perubahan besar ke GitHub!
-const CACHE_NAME = 'alquran-cache-v8';
+const CACHE_NAME = 'alquran-cache-v9';
 
 // Daftarkan semua file yang wajib di-cache agar bisa offline dan fast-loading
 const urlsToCache = [
