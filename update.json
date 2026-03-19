@@ -1,12 +1,13 @@
 {
   "created_by": "Sahal Arbani",
   "version": "5.2.2",
-  "apk_version": 4,
-  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/4.2.2/alquran_pro_v4.2.2.apk",
+  "apk_version": 5,
+  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/v5.2.2/alquran_pro_v5.2.2.apk",
   "tanggal_update": "19 Maret 2026",
   "fitur_baru": [
-    " + add fitur holiday + perayaan ",
-    " + new ui color calender"
+    "Smart Calendar Integration: Injeksi API Hari Libur Nasional secara asinkron dengan sistem caching memori pintar (Zero-Data Waste).",
+    "Dynamic Color Hierarchy: Perombakan UI kalender dengan logika pewarnaan adaptif (Merah otomatis untuk hari Ahad & Libur Nasional, Hijau untuk hari Jumat).",
+    "Graceful Degradation (Offline Mode): Sistem intersepsi pintar pada WebView yang menampilkan UI offline lokal saat koneksi terputus, lengkap dengan Native Micro-Interactions."
   ],
   "petunjuk": [
     "Saat melakukan update aplikasi, pastikan izin Notifikasi telah diaktifkan agar progres pengunduhan muncul di status bar.",
@@ -14,8 +15,9 @@
     "Ubah warna aksen di Pengaturan, seluruh elemen (termasuk Tasbih dan Kalender) akan otomatis tersinkronisasi."
   ],
   "bug": [
+    "Mencegah tampilan error default OS (ERR_NAME_NOT_RESOLVED) yang tidak profesional saat tidak ada koneksi internet.",
     "Menumpas Silent Drop (gagal unduh senyap) akibat pemblokiran ketat dari mesin DownloadManager bawaan Android 14.",
     "Pembersihan artefak arsitektur lama (BroadcastReceiver) untuk efisiensi beban kerja CPU dan manajemen memori.",
-    "Menyelesaikan Race Condition pada sinkronisasi warna Iframe Tasbih Digital.",
-    "Menumpas bug Engine WebView yang menahan cache pop-up pembaruan aplikasi."
-    }
+    "Menyelesaikan Race Condition pada sinkronisasi warna Iframe Tasbih Digital."
+  ]
+}
