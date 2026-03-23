@@ -1,10 +1,13 @@
 {
   "created_by": "Sahal Arbani",
-  "version": "5.2.2",
+  "version": "6.2.2",
   "apk_version": 4,
-  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/v5.2.2/alquran_pro_v5.2.2.apk",
+  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/5.2.2/alquran_pro.apk",
   "tanggal_update": "19 Maret 2026",
   "fitur_baru": [
+    "+ add fitur bookmark",
+    "+ add fitur repeat audio",
+    " - fix audio background",
     "Smart Calendar Integration: Injeksi API Hari Libur Nasional secara asinkron dengan sistem caching memori pintar (Zero-Data Waste).",
     "Dynamic Color Hierarchy: Perombakan UI kalender dengan logika pewarnaan adaptif (Merah otomatis untuk hari Ahad & Libur Nasional, Hijau untuk hari Jumat).",
     "Graceful Degradation (Offline Mode): Sistem intersepsi pintar pada WebView yang menampilkan UI offline lokal saat koneksi terputus, lengkap dengan Native Micro-Interactions."
