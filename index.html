@@ -137,6 +137,22 @@
     .sholat-row:last-child { border-bottom: none; }
     .sholat-row.highlight { background-color: var(--ios-gray-fill); border-left: 4px solid var(--ios-blue); border-radius: 8px; border-bottom: none; margin: 4px 0; }
     .sholat-row.highlight .s-name, .sholat-row.highlight .s-time { color: var(--ios-blue); font-weight: 700; }
+
+    /* CSS BOOKMARK BANNER & TOAST */
+    .bookmark-banner { background: var(--ios-bg-secondary); border-radius: 16px; padding: 16px; margin-bottom: 20px; border: 0.5px solid var(--ios-glass-border); box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .bm-pill { background: rgba(10, 132, 255, 0.1); color: var(--ios-blue); padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; }
+    .bm-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 0.5px solid var(--ios-glass-border); cursor: pointer; transition: opacity 0.2s; }
+    .bm-list-item:active { opacity: 0.6; }
+    .bm-list-item:last-child { border-bottom: none; padding-bottom: 0; }
+    
+    .ios-toast {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150%);
+      background: var(--ios-glass-bg); backdrop-filter: blur(25px) saturate(200%); -webkit-backdrop-filter: blur(25px) saturate(200%);
+      color: var(--ios-text-main); padding: 12px 24px; border-radius: 30px; border: 0.5px solid var(--ios-glass-border);
+      font-size: 0.95rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 9999;
+      opacity: 0; transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none;
+    }
+    .ios-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   </style>
 </head>
 <body class="dark-mode">
@@ -169,6 +185,9 @@
       </div>
       <button class="btn-search-deep" onclick="executeDeepSearch()">Cari Ayat</button>
     </div>
+    
+    <div id="smartBookmarkBanner" style="display: none;"></div>
+    
     <div id="surahList" class="row g-2"></div>
   </div>
 
@@ -243,16 +262,25 @@
 </main>
 
 <div class="dynamic-pill" id="miniPlayer">
-  <div class="d-flex align-items-center overflow-hidden">
-    <i class="bi bi-soundwave fs-4 me-3" style="color: var(--ios-green);"></i>
+  <div class="d-flex align-items-center overflow-hidden" style="max-width: 50%;">
+    <i class="bi bi-soundwave fs-4 me-2" style="color: var(--ios-green);"></i>
     <div class="text-truncate">
-      <div class="fw-bold" style="font-size: 0.9rem; color: var(--ios-text-main);">Memutar Audio</div>
-      <div style="font-size: 0.8rem; color: var(--ios-text-muted);" id="playerSubtext">Ayat sedang diputar</div>
+      <div class="fw-bold" style="font-size: 0.85rem; color: var(--ios-text-main);">Murottal</div>
+      <div style="font-size: 0.75rem; color: var(--ios-text-muted);" id="playerSubtext">Menyiapkan...</div>
     </div>
   </div>
-  <button class="ios-btn-text text-danger" onclick="stopAudio()">
-    <i class="bi bi-stop-circle-fill fs-3"></i>
-  </button>
+  <div class="d-flex align-items-center gap-3">
+    <button class="ios-btn-text position-relative" onclick="toggleRepeat()" id="btnRepeat" style="color: var(--ios-text-muted);">
+      <i class="bi bi-repeat fs-4"></i>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="font-size: 0.55rem; background-color: var(--ios-blue); display: none;" id="badgeRepeat">1</span>
+    </button>
+    <button class="ios-btn-text" onclick="toggleInfinite()" id="btnInfinite" style="color: var(--ios-text-muted);">
+      <i class="bi bi-infinity fs-3"></i>
+    </button>
+    <button class="ios-btn-text text-danger" onclick="stopAudio()">
+      <i class="bi bi-stop-circle-fill fs-2"></i>
+    </button>
+  </div>
 </div>
 
 <nav class="ios-tab-bar" id="bottomNav">
@@ -274,8 +302,11 @@
 </nav>
 
 <div class="offcanvas offcanvas-bottom h-auto" tabindex="-1" id="settingsSheet">
-  <div class="offcanvas-header border-bottom border-secondary mb-3">
-    <h6 class="fw-bold mb-0 w-100 text-center">Pengaturan Sistem</h6>
+  <div class="offcanvas-header border-bottom border-secondary pb-3">
+    <div class="w-100 d-flex justify-content-between align-items-center">
+      <h6 class="fw-bold mb-0" style="color: var(--ios-text-main);">Pengaturan Sistem</h6>
+      <button type="button" class="ios-btn-text" data-bs-dismiss="offcanvas" style="font-weight: 600;">Tutup</button>
+    </div>
   </div>
   <div class="offcanvas-body">
     
@@ -411,6 +442,201 @@ const MIN_FONT_SIZE = 1.2;
 
 let isAzanAuto = localStorage.getItem("isAzanAuto") === "false" ? false : true;
 
+// --- STATE MANAGEMENT MESIN MUROTTAL (BUG FIX) ---
+let targetRepeat = 0;
+let currentRepeatCount = 0;
+let isInfiniteLoop = false;
+let playMode = 'single'; 
+
+function toggleRepeat() {
+  targetRepeat++;
+  if (targetRepeat > 8) targetRepeat = 0;
+  
+  const btn = document.getElementById("btnRepeat");
+  const badge = document.getElementById("badgeRepeat");
+  
+  if (targetRepeat > 0) {
+    btn.style.color = "var(--ios-blue)";
+    badge.innerText = targetRepeat;
+    badge.style.display = "inline-block";
+  } else {
+    btn.style.color = "var(--ios-text-muted)";
+    badge.style.display = "none";
+  }
+  currentRepeatCount = 0; 
+  updatePlayerSubtext();
+}
+
+function toggleInfinite() {
+  isInfiniteLoop = !isInfiniteLoop;
+  const btn = document.getElementById("btnInfinite");
+  btn.style.color = isInfiniteLoop ? "var(--ios-blue)" : "var(--ios-text-muted)";
+  updatePlayerSubtext();
+}
+
+function updatePlayerSubtext() {
+  if (currentIndex >= versesData.length) return;
+  let repeatText = "";
+  if (isInfiniteLoop) repeatText = " | ∞";
+  else if (targetRepeat > 0) repeatText = ` | Ulang: ${currentRepeatCount}/${targetRepeat}`;
+  
+  let modeText = playMode === 'all' ? "Otomatis: " : "";
+  document.getElementById("playerSubtext").innerText = `${modeText}Ayat ${versesData[currentIndex].nomorAyat}${repeatText}`;
+}
+
+function getSelectedQori() {
+  const qori = document.getElementById("qoriSelect").value;
+  if (!qori) { new bootstrap.Offcanvas(document.getElementById('settingsSheet')).show(); return null; }
+  return qori;
+}
+
+function showMiniPlayer(show) {
+  const player = document.getElementById("miniPlayer");
+  if (show) player.classList.add("visible"); else player.classList.remove("visible");
+}
+
+function playVerse(index) {
+  const qori = getSelectedQori(); if (!qori) return; 
+  currentIndex = index;
+  currentRepeatCount = 0; 
+  playMode = 'single'; 
+  executePlay();
+}
+
+function playAllVerses() { 
+  if (!getSelectedQori() || !versesData.length) return; 
+  currentIndex = 0; 
+  currentRepeatCount = 0;
+  playMode = 'all'; 
+  executePlay(); 
+}
+
+function executePlay() {
+  if (currentIndex >= versesData.length) { stopAudio(); return; }
+  const audio = document.getElementById("audioPlayer"); 
+  audio.src = versesData[currentIndex].audio[getSelectedQori()]; 
+  audio.play();
+  showMiniPlayer(true); 
+  updatePlayerSubtext();
+  highlightVerse(currentIndex);
+  
+  // TRIGGER NATIVE BACKGROUND SERVICE
+  if (typeof AndroidBridge !== "undefined") {
+      try { AndroidBridge.startMurottalService(); } catch(e) {}
+  }
+  
+  // ARSITEKTUR KEPUTUSAN GANDA (DUAL DECISION TREE) YANG DIPERBAIKI
+  audio.onended = () => { 
+    if (playMode === 'single') {
+      // Skenario 1: Mode Single (Fokus Ulang 1 Ayat Saja)
+      if (isInfiniteLoop) {
+        executePlay(); 
+      } else if (currentRepeatCount < targetRepeat) {
+        currentRepeatCount++;
+        executePlay(); 
+      } else {
+        stopAudio(); // Target ayat selesai, mesin mati.
+      }
+      
+    } else if (playMode === 'all') {
+      // Skenario 2: Mode All (Fokus Ulang 1 Full Surah)
+      currentIndex++; // Selalu maju ke ayat berikutnya dulu
+      
+      if (currentIndex < versesData.length) {
+        // Masih ada ayat di dalam surah, lanjut play TANPA nambah hitungan repeat
+        executePlay(); 
+      } else {
+        // Ujung Surah Tercapai! Baru disini mesin memikirkan apakah harus diulang
+        if (isInfiniteLoop) {
+          currentIndex = 0; // Lempar balik ke ayat 1
+          executePlay(); 
+        } else if (currentRepeatCount < targetRepeat) {
+          currentRepeatCount++; // Tambah hitungan ulangan surah
+          currentIndex = 0; // Lempar balik ke ayat 1
+          executePlay(); 
+        } else {
+          stopAudio(); // Surah kelar, target tercapai, mesin mati.
+        }
+      }
+    }
+  };
+}
+
+function stopAudio() {
+  const audio = document.getElementById("audioPlayer");
+  audio.pause(); audio.currentTime = 0; 
+  showMiniPlayer(false);
+  document.querySelectorAll(".verse-card").forEach(el => el.classList.remove("active"));
+  
+  // MATIKAN NATIVE BACKGROUND SERVICE
+  if (typeof AndroidBridge !== "undefined") {
+      try { AndroidBridge.stopMurottalService(); } catch(e) {}
+  }
+}
+
+function showToast(msg) {
+  let toast = document.getElementById('iosToast');
+  if(!toast) {
+    toast = document.createElement('div'); toast.id = 'iosToast'; toast.className = 'ios-toast';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `<i class="bi bi-check-circle-fill me-2" style="color: var(--ios-green);"></i> ${msg}`;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function saveBookmark(surahNum, surahName, ayahNum, teksArab, teksLatin, teksIndo) {
+  let bms = JSON.parse(localStorage.getItem('quran_bookmarks') || '[]');
+  bms = bms.filter(bm => !(bm.surahNum === surahNum && bm.ayahNum === ayahNum));
+  bms.push({ id: Date.now(), surahNum, surahName, ayahNum, teksArab, teksLatin, teksIndo, timestamp: Date.now() });
+  localStorage.setItem('quran_bookmarks', JSON.stringify(bms));
+  
+  showToast(`Ayat ${ayahNum} berhasil ditandai!`);
+  renderSmartBanner(); 
+}
+
+function renderSmartBanner() {
+  let bms = JSON.parse(localStorage.getItem('quran_bookmarks') || '[]');
+  const banner = document.getElementById('smartBookmarkBanner');
+  if(bms.length === 0) { banner.style.display = 'none'; return; }
+  
+  bms.sort((a,b) => b.timestamp - a.timestamp);
+  const topBms = bms.slice(0, 3);
+  
+  let html = `<div class="bookmark-banner">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="bm-pill"><i class="bi bi-bookmark-fill me-1"></i> Terakhir Dibaca</div>
+                  <a href="bookmark.html" style="font-size: 0.85rem; text-decoration: none; color: var(--ios-blue); font-weight: 600;">Lihat Semua <i class="bi bi-arrow-right-short"></i></a>
+                </div>`;
+                
+  topBms.forEach(bm => {
+    html += `<div class="bm-list-item" onclick="openSurahDetail(${bm.surahNum}, '${bm.surahName.replace(/'/g, "\\'")}', ${bm.ayahNum})">
+               <div>
+                 <div style="font-size: 0.95rem; font-weight: 600; color: var(--ios-text-main);">Surah ${bm.surahName}</div>
+                 <div style="font-size: 0.8rem; color: var(--ios-text-muted);">Ayat ${bm.ayahNum}</div>
+               </div>
+               <i class="bi bi-chevron-right" style="color: var(--ios-text-muted); font-size: 1rem;"></i>
+             </div>`;
+  });
+  html += `</div>`;
+  banner.innerHTML = html;
+  banner.style.display = 'block';
+}
+
+async function checkUrlParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const openSurah = urlParams.get('openSurah');
+  const scrollAyah = urlParams.get('scrollAyah');
+  
+  if (openSurah && scrollAyah) {
+    const surah = allSurahs.find(s => s.nomor == openSurah);
+    if (surah) {
+      openSurahDetail(surah.nomor, surah.namaLatin, scrollAyah);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
+}
+
 function initAzanSetting() {
   const sw = document.getElementById("sw-azan");
   if (isAzanAuto) sw.classList.add("active");
@@ -510,6 +736,7 @@ function toggleDarkMode() {
   const body = document.body; const icon = document.getElementById("darkModeIcon");
   body.classList.toggle("dark-mode"); const isDark = body.classList.contains("dark-mode");
   icon.classList.toggle("bi-sun-fill", !isDark); icon.classList.toggle("bi-moon-stars-fill", isDark);
+  localStorage.setItem('isDarkMode', isDark);
   broadcastToIframe('tasbihFrame', 'SYNC_THEME', { isDark: isDark });
   broadcastToIframe('kalenderFrame', 'SYNC_THEME', { isDark: isDark });
 }
@@ -544,6 +771,7 @@ function navigateTo(pageId, verseIndex = null) {
   
   if (pageId === "homePage") {
     updateTopBar("Al-Qur'an"); bottomNav.classList.remove("hidden"); miniPlayer.classList.remove("expanded-view"); updateBottomNav("homePage");
+    renderSmartBanner();
   } else if (pageId === "tahlilPage") {
     updateTopBar("Tahlil"); bottomNav.classList.remove("hidden"); miniPlayer.classList.remove("expanded-view"); updateBottomNav("tahlilPage"); loadTahlil(verseIndex);
   } else if (pageId === "hadrohPage") {
@@ -566,6 +794,7 @@ async function loadSurahList() {
   try {
     const res = await fetch(`${API_V2_EQURAN}/surat`);
     const data = await res.json(); allSurahs = data.data; renderSurahList(allSurahs);
+    checkUrlParams(); 
   } catch (err) {}
   showLoading(false);
 }
@@ -586,24 +815,26 @@ document.getElementById("searchInput").addEventListener("input", e => {
   renderSurahList(allSurahs.filter(s => s.nama.toLowerCase().includes(val) || s.namaLatin.toLowerCase().includes(val) || s.nomor.toString().includes(val)));
 });
 
-function openSurahDetail(nomor, namaLatin) {
+function openSurahDetail(nomor, namaLatin, targetAyah = null) {
   updateTopBar(namaLatin, true, true);
   document.getElementById("bottomNav").classList.add("hidden"); document.getElementById("miniPlayer").classList.add("expanded-view"); 
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active-page"));
   document.getElementById("detailPage").classList.add("active-page");
-  window.scrollTo(0,0); loadSurahDetail(nomor);
+  window.scrollTo(0,0); loadSurahDetail(nomor, targetAyah);
 }
 
-async function loadSurahDetail(nomor) {
+async function loadSurahDetail(nomor, targetAyah = null) {
   showLoading(true); document.getElementById("versesContainer").innerHTML = ""; 
   try {
     const res = await fetch(`${API_V2_EQURAN}/surat/${nomor}`);
     const data = await res.json(); versesData = data.data.ayat; const surahName = data.data.namaLatin;
+    
     document.getElementById("versesContainer").innerHTML = versesData.map((v, i) => `
       <div class="verse-card" id="verse-${i}">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <span class="ios-badge">${v.nomorAyat}</span>
           <div class="d-flex gap-3">
+            <button class="ios-btn-text" style="font-size: 1.1rem;" onclick="saveBookmark(${nomor}, '${surahName.replace(/'/g, "\\'")}', ${v.nomorAyat}, '${v.teksArab.replace(/'/g, "\\'")}', '${v.teksLatin.replace(/'/g, "\\'").replace(/"/g, "&quot;")}', '${v.teksIndonesia.replace(/'/g, "\\'").replace(/"/g, "&quot;")}')"><i class="bi bi-bookmark"></i></button>
             <button class="ios-btn-text" style="font-size: 0.9rem; font-weight: 600;" onclick="fetchTafsirV3(${nomor}, ${v.nomorAyat}, '${surahName.replace(/'/g, "\\'")}')">Tafsir <i class="bi bi-book ms-1"></i></button>
             <button class="ios-btn-text" onclick="playVerse(${i})"><i class="bi bi-play-circle-fill fs-3"></i></button>
           </div>
@@ -613,6 +844,14 @@ async function loadSurahDetail(nomor) {
         <div class="text-indo">${v.teksIndonesia}</div>
       </div>
     `).join("");
+
+    if (targetAyah !== null) {
+       const ayahIndex = versesData.findIndex(v => v.nomorAyat == targetAyah);
+       if(ayahIndex !== -1) {
+          setTimeout(() => { highlightVerse(ayahIndex); }, 500);
+       }
+    }
+
   } catch (err) {}
   showLoading(false);
 }
@@ -650,36 +889,16 @@ async function fetchTafsirV3(surahNum, ayahNum, surahName) {
   showLoading(false);
 }
 
-function getSelectedQori() {
-  const qori = document.getElementById("qoriSelect").value;
-  if (!qori) { new bootstrap.Offcanvas(document.getElementById('settingsSheet')).show(); return null; }
-  return qori;
-}
-function showMiniPlayer(show) {
-  const player = document.getElementById("miniPlayer");
-  if (show) player.classList.add("visible"); else player.classList.remove("visible");
-}
-function playVerse(index) {
-  const qori = getSelectedQori(); if (!qori) return; currentIndex = index;
-  const audio = document.getElementById("audioPlayer"); audio.src = versesData[index].audio[qori]; audio.play();
-  showMiniPlayer(true); document.getElementById("playerSubtext").innerText = `Memutar Ayat ${versesData[index].nomorAyat}`; highlightVerse(index);
-}
-function playAllVerses() { if (!getSelectedQori() || !versesData.length) return; currentIndex = 0; playSequential(); }
-function playSequential() {
-  if (currentIndex >= versesData.length) { stopAudio(); return; }
-  const audio = document.getElementById("audioPlayer"); audio.src = versesData[currentIndex].audio[getSelectedQori()]; audio.play();
-  showMiniPlayer(true); document.getElementById("playerSubtext").innerText = `Otomatis: Ayat ${versesData[currentIndex].nomorAyat}`; highlightVerse(currentIndex);
-  audio.onended = () => { currentIndex++; playSequential(); };
-}
-function stopAudio() {
-  document.getElementById("audioPlayer").pause(); document.getElementById("audioPlayer").currentTime = 0; showMiniPlayer(false);
-  document.querySelectorAll(".verse-card").forEach(el => el.classList.remove("active"));
-}
 function highlightVerse(index) {
   document.querySelectorAll(".verse-card").forEach(el => el.classList.remove("active"));
   const verseEl = document.getElementById(`verse-${index}`);
-  if (verseEl) { verseEl.classList.add("active"); window.scrollTo({top: verseEl.getBoundingClientRect().top - 120, behavior: 'smooth'}); }
+  if (verseEl) { 
+    verseEl.classList.add("active"); 
+    const absoluteY = verseEl.getBoundingClientRect().top + window.scrollY - 120;
+    window.scrollTo({top: absoluteY, behavior: 'smooth'}); 
+  }
 }
+
 function changeFontSize(direction) {
   if (direction === 'increase' && currentFontSize < MAX_FONT_SIZE) currentFontSize += FONT_STEP;
   if (direction === 'decrease' && currentFontSize > MIN_FONT_SIZE) currentFontSize -= FONT_STEP;
@@ -713,23 +932,17 @@ async function loadHadroh() {
 
 function closeFloatingModal() { const m = document.getElementById("floatingModal"); if (m) m.remove(); }
 
-// --- ARSITEKTUR OTA UPDATE TINGKAT DEWA ---
 async function checkAutoUpdate(isManual = false) {
   try {
     const data = await (await fetch("update.json", { cache: "no-store" })).json();
     let currentNativeVersion = 0;
-    
-    // 1. Tanya langsung ke otak Android
     if (typeof AndroidBridge !== 'undefined') {
       currentNativeVersion = AndroidBridge.getNativeVersionCode();
     } else {
-      // Bypass untuk testing di lingkungan browser
       currentNativeVersion = parseInt(localStorage.getItem("lastAppVersion") || "0");
     }
 
-    // 2. Eksekusi Modal: Muncul otomatis jika ada update, ATAU paksa muncul jika user ngeklik tombol
     if (currentNativeVersion < data.apk_version || isManual) {
-      // Lempar currentNativeVersion ke fungsi render UI sebagai parameter
       showUpdateModal(data, currentNativeVersion);
     }
   } catch (e) {
@@ -747,34 +960,20 @@ async function showUpdateModal(data, currentNativeVersion) {
     let buttonHTML = '';
     let badgeHTML = '';
 
-    // --- LOGIKA KOMPARATOR VERSI (DYNAMIC UI) ---
     if (currentNativeVersion >= data.apk_version) {
-      // Skenario 1: Aplikasi Sudah Paling Baru
       badgeHTML = `<span style="background-color: var(--ios-green); color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;"><i class="bi bi-check-circle-fill me-1"></i> Versi Saat Ini: ${data.version}</span>`;
-      
-      // Tombol dikunci (disabled), warna jadi abu-abu kusam (gray-fill), dan kursor not-allowed
-      buttonHTML = `<button id="btnDownloadUpdate" disabled style="background-color: var(--ios-gray-fill); color: var(--ios-text-muted); border: none; border-radius: 12px; padding: 14px; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; cursor: not-allowed;">
-        Aplikasi Sudah Terkini
-      </button>`;
+      buttonHTML = `<button id="btnDownloadUpdate" disabled style="background-color: var(--ios-gray-fill); color: var(--ios-text-muted); border: none; border-radius: 12px; padding: 14px; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; cursor: not-allowed;">Aplikasi Sudah Terkini</button>`;
     } else {
-      // Skenario 2: Ditemukan Versi Baru di Server
       badgeHTML = `<span style="background-color: var(--ios-blue); color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;"><i class="bi bi-info-circle-fill me-1"></i> Versi Baru: ${data.version}</span>`;
-      
-      // Tombol aktif menyala dengan warna biru khas iOS
-      buttonHTML = `<button id="btnDownloadUpdate" onclick="executeNativeUpdate('${data.apk_url}', ${data.apk_version})" style="background-color: var(--ios-blue); color: white; border: none; border-radius: 12px; padding: 14px; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.3);">
-        <i class="bi bi-cloud-arrow-down-fill me-2"></i> Update Sekarang
-      </button>`;
+      buttonHTML = `<button id="btnDownloadUpdate" onclick="executeNativeUpdate('${data.apk_url}', ${data.apk_version})" style="background-color: var(--ios-blue); color: white; border: none; border-radius: 12px; padding: 14px; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.3);"><i class="bi bi-cloud-arrow-down-fill me-2"></i> Update Sekarang</button>`;
     }
 
-    // Injeksi hasil komparator ke dalam DOM tree
     document.getElementById("floatingContent").innerHTML = `
       <div style="text-align: center; margin-bottom: 24px;">
         ${badgeHTML}
         <div style="font-size: 0.8rem; color: var(--ios-text-muted); margin-top: 8px;">Diperbarui: ${data.tanggal_update}</div>
       </div>
-      
       ${buttonHTML}
-
       <h6 style="font-weight: 700; color: var(--ios-green); font-size: 0.95rem; margin-bottom: 10px;"><i class="bi bi-stars me-1"></i> Peningkatan Fitur</h6>
       <ul style="font-size: 0.85rem; color: var(--ios-text-main); padding-left: 20px; margin-bottom: 20px;">${data.fitur_baru.map(f => `<li style="margin-bottom: 6px;">${f}</li>`).join("")}</ul>
       <h6 style="font-weight: 700; color: var(--ios-warning); font-size: 0.95rem; margin-bottom: 10px;"><i class="bi bi-journal-text me-1"></i> Petunjuk Penggunaan</h6>
@@ -791,15 +990,9 @@ function executeNativeUpdate(url, version) {
   btn.innerHTML = `<i class="bi bi-hourglass-split me-2"></i> Mengunduh... Lihat Status Bar`;
   btn.style.backgroundColor = 'var(--ios-warning)';
   btn.disabled = true;
-
-  if (typeof AndroidBridge !== 'undefined') {
-    AndroidBridge.triggerUpdate(url, version);
-  } else {
-    window.open(url);
-  }
+  if (typeof AndroidBridge !== 'undefined') { AndroidBridge.triggerUpdate(url, version); } else { window.open(url); }
 }
 
-// --- LOGIKA JADWAL SHOLAT SPA NATIVE ---
 let activeJadwal = {};
 let jadwalInterval = null;
 let allCitiesData = []; 
@@ -815,9 +1008,7 @@ function updateClock() {
 async function initJadwalSholat() {
   if (jadwalInterval) clearInterval(jadwalInterval);
   updateClock();
-  jadwalInterval = setInterval(() => {
-    updateClock(); if(Object.keys(activeJadwal).length > 0) calculateCountdown();
-  }, 1000);
+  jadwalInterval = setInterval(() => { updateClock(); if(Object.keys(activeJadwal).length > 0) calculateCountdown(); }, 1000);
 
   let kotaId = localStorage.getItem('kotaId') || '1632'; 
   let lokasiName = localStorage.getItem('selectedLocation') || 'Jakarta';
@@ -896,13 +1087,12 @@ function saveCity(id, name) {
 }
 
 window.addEventListener("load", () => {
+  renderSmartBanner();
   loadSurahList();
   initAzanSetting();
-  checkAutoUpdate(false); // Mode background saat app dibuka
+  checkAutoUpdate(false);
   
-  // FAIL-SAFE SINKRONISASI TASBIH (Coba tembak ulang warna setelah 0.5 detik)
   setTimeout(syncToIframe, 500); 
-
   try { initCustomColor(); } catch (e) {}
 });
 </script>
