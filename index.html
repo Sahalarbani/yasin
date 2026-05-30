@@ -1072,10 +1072,30 @@ function changeFontSize(direction) {
 }
 
 async function loadTahlil(verseIndex = null) {
-  if(document.getElementById("tahlilContent").innerHTML !== "") return; 
+  if(document.getElementById("tahlilContent").innerHTML !== "") return;
+  const fileName = "tahlil.json";
   try {
-    const data = await (await fetch("tahlil.json")).json();
-    document.getElementById("tahlilContent").innerHTML = data.result.map((item, index) => `
+    let data = null;
+    if (typeof NativeManager !== "undefined" && NativeManager.cekStatusOffline(fileName)) {
+      data = NativeManager.bacaDataOffline(fileName);
+    }
+    if (!data) {
+      data = await (await fetch(fileName)).json();
+    }
+
+    let offlineBtnHtml = '';
+    if (typeof NativeManager !== "undefined" && NativeManager.isNativeEnvironment()) {
+      const isOffline = NativeManager.cekStatusOffline(fileName);
+      const downloadUrl = new URL(fileName, window.location.href).href;
+      if (isOffline) {
+        offlineBtnHtml = `<button id="btnDownloadOffline" class="ios-btn-text ms-auto px-3 py-2" style="background-color: #35393C; color: #FFFFFF; border-radius: 12px; font-size: 0.85rem; font-weight: 600;" disabled><i class="bi bi-check-circle-fill me-1"></i> Tahlil Offline</button>`;
+      } else {
+        offlineBtnHtml = `<button id="btnDownloadOffline" class="ios-btn-text ms-auto px-3 py-2" style="background-color: #1C1C1E; color: #EBEBF5; border-radius: 12px; font-size: 0.85rem; font-weight: 600; border: 1px solid #38383A;" onclick="NativeManager.unduhUntukOffline('${downloadUrl}', '${fileName}')"><i class="bi bi-cloud-arrow-down-fill me-1"></i> Simpan Tahlil Offline</button>`;
+      }
+    }
+
+    const headerHtml = `<div class="d-flex align-items-center mb-4">${offlineBtnHtml}</div>`;
+    document.getElementById("tahlilContent").innerHTML = headerHtml + data.result.map((item, index) => `
       <div class="verse-card" id="tahlil-verse-${index}">
         ${item.judul ? `<h6 class="fw-bold mb-3" style="color: var(--ios-blue);">${item.judul}</h6>` : ''}
         <div class="text-arab" style="font-size: ${currentFontSize}rem;">${item.arab}</div>
@@ -1085,7 +1105,9 @@ async function loadTahlil(verseIndex = null) {
       </div>
     `).join("");
     if (verseIndex !== null) setTimeout(() => { const t = document.getElementById(`tahlil-verse-${verseIndex}`); if(t) { t.classList.add('active'); window.scrollTo({top: t.getBoundingClientRect().top + window.pageYOffset - 100, behavior: 'smooth'}); } }, 400);
-  } catch (err) {}
+  } catch (err) {
+    document.getElementById("tahlilContent").innerHTML = `<div class="ios-card d-block text-center"><h6 class="fw-bold mb-2">Tahlil belum tersedia offline</h6><p class="mb-0" style="color: var(--ios-text-muted); font-size: 0.9rem;">Buka halaman ini sekali saat online agar data tersimpan.</p></div>`;
+  }
 }
 
 async function loadHadroh() {
@@ -1290,32 +1312,41 @@ window.addEventListener("load", () => {
 
 const NativeManager = {
     isNativeEnvironment: function() {
-        return typeof window.AndroidApp !== 'undefined';
+        return this.getBridge() !== null;
+    },
+
+    getBridge: function() {
+        if (typeof window.AndroidBridge !== 'undefined') return window.AndroidBridge;
+        if (typeof window.AndroidApp !== 'undefined') return window.AndroidApp;
+        return null;
     },
 
     cekStatusOffline: function(fileName) {
-        if (this.isNativeEnvironment()) {
-            return window.AndroidApp.checkOfflineData(fileName);
+        const bridge = this.getBridge();
+        if (bridge) {
+            return bridge.checkOfflineData(fileName);
         }
         return false;
     },
 
     unduhUntukOffline: function(apiUrl, fileName) {
-        if (this.isNativeEnvironment()) {
+        const bridge = this.getBridge();
+        if (bridge) {
             const btn = document.getElementById('btnDownloadOffline');
             if (btn) {
                 btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengunduh...';
                 btn.disabled = true;
             }
-            window.AndroidApp.downloadDataInBackground(apiUrl, fileName);
+            bridge.downloadDataInBackground(apiUrl, fileName);
         } else {
             showToast("Fitur unduh offline hanya aktif di dalam aplikasi native.");
         }
     },
 
     bacaDataOffline: function(fileName) {
-        if (this.isNativeEnvironment()) {
-            const rawData = window.AndroidApp.readOfflineData(fileName);
+        const bridge = this.getBridge();
+        if (bridge) {
+            const rawData = bridge.readOfflineData(fileName);
             if (rawData) {
                 return JSON.parse(rawData);
             }
@@ -1333,7 +1364,7 @@ window.onDownloadSuccess = function(fileName) {
         btn.style.border = 'none';
         btn.disabled = true;
     }
-    showToast("Surat berhasil disimpan secara offline.");
+    showToast("Data berhasil disimpan secara offline.");
 };
 
 window.onDownloadError = function(fileName) {
@@ -1342,7 +1373,7 @@ window.onDownloadError = function(fileName) {
         btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i> Coba Unduh Lagi';
         btn.disabled = false;
     }
-    showToast("Gagal mengunduh surat. Coba periksa koneksi.");
+    showToast("Gagal mengunduh data. Coba periksa koneksi.");
 };
 
 // Menimpa fungsi eksisting di index.html
