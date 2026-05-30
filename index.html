@@ -1276,6 +1276,140 @@ window.addEventListener("load", () => {
   setTimeout(syncToIframe, 500); 
   try { initCustomColor(); } catch (e) {}
 });
+
+/*
+ * ==========================================
+ * VERSION: 1.1.0
+ * DATE: 30 Mei 2026
+ * CHANGELOG:
+ * + Modul NativeManager terintegrasi dengan arsitektur microservice frontend.
+ * + Pembaruan logika loadSurahDetail untuk memprioritaskan data lokal (Native Storage) sebelum fetch eksternal.
+ * + Implementasi UI tombol download dengan skema warna Onyx.
+ * ==========================================
+ */
+
+const NativeManager = {
+    isNativeEnvironment: function() {
+        return typeof window.AndroidApp !== 'undefined';
+    },
+
+    cekStatusOffline: function(fileName) {
+        if (this.isNativeEnvironment()) {
+            return window.AndroidApp.checkOfflineData(fileName);
+        }
+        return false;
+    },
+
+    unduhUntukOffline: function(apiUrl, fileName) {
+        if (this.isNativeEnvironment()) {
+            const btn = document.getElementById('btnDownloadOffline');
+            if (btn) {
+                btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengunduh...';
+                btn.disabled = true;
+            }
+            window.AndroidApp.downloadDataInBackground(apiUrl, fileName);
+        } else {
+            showToast("Fitur unduh offline hanya aktif di dalam aplikasi native.");
+        }
+    },
+
+    bacaDataOffline: function(fileName) {
+        if (this.isNativeEnvironment()) {
+            const rawData = window.AndroidApp.readOfflineData(fileName);
+            if (rawData) {
+                return JSON.parse(rawData);
+            }
+        }
+        return null;
+    }
+};
+
+window.onDownloadSuccess = function(fileName) {
+    const btn = document.getElementById('btnDownloadOffline');
+    if (btn) {
+        btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Tersedia Offline';
+        btn.style.backgroundColor = '#35393C';
+        btn.style.color = '#FFFFFF';
+        btn.style.border = 'none';
+        btn.disabled = true;
+    }
+    showToast("Surat berhasil disimpan secara offline.");
+};
+
+window.onDownloadError = function(fileName) {
+    const btn = document.getElementById('btnDownloadOffline');
+    if (btn) {
+        btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i> Coba Unduh Lagi';
+        btn.disabled = false;
+    }
+    showToast("Gagal mengunduh surat. Coba periksa koneksi.");
+};
+
+// Menimpa fungsi eksisting di index.html
+async function loadSurahDetail(nomor, targetAyah = null) {
+    showLoading(true); 
+    document.getElementById("versesContainer").innerHTML = ""; 
+    
+    const fileName = `surat_${nomor}.json`;
+    const apiUrl = `${API_V2_EQURAN}/surat/${nomor}`;
+    let dataJson = null;
+
+    if (NativeManager.cekStatusOffline(fileName)) {
+        dataJson = NativeManager.bacaDataOffline(fileName);
+    }
+
+    try {
+        if (!dataJson) {
+            const res = await fetch(apiUrl);
+            dataJson = await res.json();
+        }
+
+        versesData = dataJson.data.ayat; 
+        const surahName = dataJson.data.namaLatin;
+        
+        let offlineBtnHtml = '';
+        if (NativeManager.isNativeEnvironment()) {
+            const isOffline = NativeManager.cekStatusOffline(fileName);
+            if (isOffline) {
+                offlineBtnHtml = `<button id="btnDownloadOffline" class="ios-btn-text ms-auto px-3 py-2" style="background-color: #35393C; color: #FFFFFF; border-radius: 12px; font-size: 0.85rem; font-weight: 600;" disabled><i class="bi bi-check-circle-fill me-1"></i> Tersedia Offline</button>`;
+            } else {
+                offlineBtnHtml = `<button id="btnDownloadOffline" class="ios-btn-text ms-auto px-3 py-2" style="background-color: #1C1C1E; color: #EBEBF5; border-radius: 12px; font-size: 0.85rem; font-weight: 600; border: 1px solid #38383A;" onclick="NativeManager.unduhUntukOffline('${apiUrl}', '${fileName}')"><i class="bi bi-cloud-arrow-down-fill me-1"></i> Simpan Offline</button>`;
+            }
+        }
+
+        let headerHtml = `<div class="d-flex align-items-center mb-4">${offlineBtnHtml}</div>`;
+
+        let versesHtml = versesData.map((v, i) => `
+          <div class="verse-card" id="verse-${i}">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <span class="ios-badge">${v.nomorAyat}</span>
+              <div class="d-flex gap-3">
+                <button class="ios-btn-text" style="font-size: 1.1rem; color: #EBEBF5;" onclick="saveBookmark(${nomor}, '${surahName.replace(/'/g, "\\'")}', ${v.nomorAyat}, '${v.teksArab.replace(/'/g, "\\'")}', '${v.teksLatin.replace(/'/g, "\\'").replace(/"/g, "&quot;")}', '${v.teksIndonesia.replace(/'/g, "\\'").replace(/"/g, "&quot;")}')"><i class="bi bi-bookmark"></i></button>
+                <button class="ios-btn-text" style="font-size: 0.9rem; font-weight: 600; color: #EBEBF5;" onclick="fetchTafsirV3(${nomor}, ${v.nomorAyat}, '${surahName.replace(/'/g, "\\'")}')">Tafsir <i class="bi bi-book ms-1"></i></button>
+                <button class="ios-btn-text" style="color: #EBEBF5;" onclick="playVerse(${i})"><i class="bi bi-play-circle-fill fs-3"></i></button>
+              </div>
+            </div>
+            <div class="text-arab" style="font-size: ${currentFontSize}rem;">${v.teksArab}</div>
+            <div class="text-latin">${v.teksLatin}</div>
+            <div class="text-indo">${v.teksIndonesia}</div>
+          </div>
+        `).join("");
+
+        document.getElementById("versesContainer").innerHTML = headerHtml + versesHtml;
+
+        if (targetAyah !== null) {
+           const ayahIndex = versesData.findIndex(v => v.nomorAyat == targetAyah);
+           if(ayahIndex !== -1) {
+              setTimeout(() => { highlightVerse(ayahIndex); }, 500);
+           }
+        }
+
+    } catch (err) {
+        showToast("Koneksi gagal. Pastikan data sudah tersimpan offline.");
+    }
+    showLoading(false);
+}
+
 </script>
 </body>
 </html>
