@@ -10,7 +10,12 @@
     " - fix audio background",
     "Smart Calendar Integration: Injeksi API Hari Libur Nasional secara asinkron dengan sistem caching memori pintar (Zero-Data Waste).",
     "Dynamic Color Hierarchy: Perombakan UI kalender dengan logika pewarnaan adaptif (Merah otomatis untuk hari Ahad & Libur Nasional, Hijau untuk hari Jumat).",
-    "Graceful Degradation (Offline Mode): Sistem intersepsi pintar pada WebView yang menampilkan UI offline lokal saat koneksi terputus, lengkap dengan Native Micro-Interactions."
+    "Graceful Degradation (Offline Mode): Sistem intersepsi pintar pada WebView yang menampilkan UI offline lokal saat koneksi terputus, lengkap dengan Native Micro-Interactions.",
+    "Dynamic Quran Quote Hero: Homepage sekarang menampilkan kutipan ayat Al-Qur'an, arti, dan referensi surah yang berganti setiap aplikasi dibuka.",
+    "Standalone Yasin & Tahlil: Menambahkan halaman yasin-tahlil.html agar bacaan Surah Yasin dan Tahlil lengkap dapat dibuka dari satu menu tanpa menambah beban index.html.",
+    "Kalender Jawa: Menambahkan halaman kalender-jawa.html dengan weton, pasaran, neptu, navigasi bulan, serta tampilan weton hari ini.",
+    "Libur Nasional & Cuti Bersama 2026: Kalender Jawa menyimpan 17 hari libur nasional dan 8 cuti bersama berdasarkan SKB 3 Menteri agar tetap dapat dilihat saat offline.",
+    "Offline Cache v16: Menambahkan halaman Yasin & Tahlil dan Kalender Jawa ke pre-cache Service Worker agar fitur utama tetap cepat dibuka."
   ],
   "petunjuk": [
     "Saat melakukan update aplikasi, pastikan izin Notifikasi telah diaktifkan agar progres pengunduhan muncul di status bar.",

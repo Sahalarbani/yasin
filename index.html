@@ -156,10 +156,11 @@
 
 
     .home-hero {
-      min-height: 172px; border-radius: 32px; padding: 24px; margin: 4px 0 20px;
+      min-height: 250px; border-radius: 32px; padding: 22px; margin: 4px 0 20px;
       background:
-        radial-gradient(circle at 20% 18%, rgba(255,255,255,0.26), transparent 28%),
-        linear-gradient(135deg, var(--ios-blue), #34C759 58%, #FF9F0A);
+        radial-gradient(circle at 12% 0%, rgba(255,255,255,0.24), transparent 32%),
+        radial-gradient(circle at 100% 100%, rgba(255,198,92,0.28), transparent 35%),
+        linear-gradient(135deg, #085F63, #087F67 56%, #099268);
       color: #fff; display: flex; flex-direction: column; justify-content: space-between;
       box-shadow: 0 18px 42px rgba(0,0,0,0.26); overflow: hidden; position: relative;
     }
@@ -167,10 +168,17 @@
       content: ""; position: absolute; right: -38px; bottom: -54px; width: 190px; height: 190px;
       border-radius: 50%; border: 32px solid rgba(255,255,255,0.14);
     }
-    .home-kicker { font-size: 0.78rem; font-weight: 700; opacity: 0.82; text-transform: uppercase; letter-spacing: 0.08em; }
-    .home-title { font-size: 2.05rem; font-weight: 800; line-height: 1.03; margin: 10px 0 8px; letter-spacing: 0; }
-    .home-subtitle { font-size: 0.95rem; line-height: 1.45; max-width: 270px; opacity: 0.9; margin: 0; }
-    .home-status { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; border-radius: 999px; padding: 8px 12px; background: rgba(255,255,255,0.18); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); font-size: 0.82rem; font-weight: 700; }
+    .home-hero::before {
+      content: "۞"; position: absolute; right: 18px; top: 10px; color: rgba(255,255,255,0.12);
+      font-family: var(--font-arab); font-size: 7.5rem; line-height: 1;
+    }
+    .home-quote-content { position: relative; z-index: 1; }
+    .home-kicker { display: flex; align-items: center; gap: 7px; font-size: 0.72rem; font-weight: 800; opacity: 0.86; text-transform: uppercase; letter-spacing: 0.1em; }
+    .home-quote-arabic { font-family: var(--font-arab); font-size: 1.75rem; line-height: 1.85; text-align: right; margin: 17px 0 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.12); }
+    .home-quote-meaning { max-width: 520px; font-size: 0.88rem; line-height: 1.55; margin: 0; color: rgba(255,255,255,0.88); }
+    .home-quote-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; z-index: 1; margin-top: 18px; }
+    .home-status { display: inline-flex; align-items: center; gap: 7px; border-radius: 999px; padding: 8px 11px; background: rgba(255,255,255,0.17); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); font-size: 0.77rem; font-weight: 800; }
+    .home-quote-refresh { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.74); }
     .section-label { color: var(--ios-text-muted); font-size: 0.78rem; font-weight: 800; text-transform: uppercase; margin: 18px 4px 10px; }
     .app-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .app-tile {
@@ -198,7 +206,8 @@
     .quick-action i { color: var(--ios-blue); font-size: 1.12rem; }
     @media (min-width: 768px) {
       .app-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .home-hero { min-height: 210px; }
+      .home-hero { min-height: 270px; padding: 26px; }
+      .home-quote-arabic { font-size: 2rem; }
     }
   </style>
 </head>
@@ -226,12 +235,15 @@
   
   <div id="homePage" class="page active-page">
     <section class="home-hero">
-      <div>
-        <div class="home-kicker">Sahal Arbani</div>
-        <h1 class="home-title">Ruang Ibadah</h1>
-        <p class="home-subtitle">Al-Qur'an, dzikir, tahlil, hadroh, jadwal sholat, dan kalender dalam satu layar.</p>
+      <div class="home-quote-content">
+        <div class="home-kicker"><i class="bi bi-stars"></i> Inspirasi Al-Qur'an</div>
+        <div class="home-quote-arabic" id="homeQuoteArabic"></div>
+        <p class="home-quote-meaning" id="homeQuoteMeaning"></p>
       </div>
-      <div class="home-status"><i class="bi bi-phone-fill"></i> Native web app</div>
+      <div class="home-quote-footer">
+        <div class="home-status"><i class="bi bi-book-fill"></i> <span id="homeQuoteReference"></span></div>
+        <div class="home-quote-refresh"><i class="bi bi-arrow-clockwise"></i> Berganti tiap dibuka</div>
+      </div>
     </section>
 
     <div class="quick-strip">
@@ -253,9 +265,9 @@
         <span class="app-icon orange"><i class="bi bi-heptagon-fill"></i></span>
         <span><span class="app-name d-block">Tasbih</span><span class="app-desc d-block">Dzikir digital dan target</span></span>
       </button>
-      <button class="app-tile" onclick="navigateTo('tahlilPage')">
-        <span class="app-icon pink"><i class="bi bi-journal-text"></i></span>
-        <span><span class="app-name d-block">Tahlil</span><span class="app-desc d-block">Bacaan tahlil lengkap</span></span>
+      <button class="app-tile" onclick="window.location.href='yasin-tahlil.html'">
+        <span class="app-icon pink"><i class="bi bi-book-half"></i></span>
+        <span><span class="app-name d-block">Yasin & Tahlil</span><span class="app-desc d-block">Bacaan Yasin dan tahlil lengkap</span></span>
       </button>
       <button class="app-tile" onclick="navigateTo('hadrohPage')">
         <span class="app-icon indigo"><i class="bi bi-people-fill"></i></span>
@@ -264,6 +276,10 @@
       <button class="app-tile" onclick="navigateTo('kalenderPage')">
         <span class="app-icon gray"><i class="bi bi-calendar3"></i></span>
         <span><span class="app-name d-block">Kalender</span><span class="app-desc d-block">Hijriah, masehi, hari penting</span></span>
+      </button>
+      <button class="app-tile" onclick="window.location.href='kalender-jawa.html'">
+        <span class="app-icon indigo"><i class="bi bi-calendar2-week-fill"></i></span>
+        <span><span class="app-name d-block">Kalender Jawa</span><span class="app-desc d-block">Weton, pasaran, libur, cuti bersama</span></span>
       </button>
     </div>
   </div>
@@ -1287,7 +1303,31 @@ window.addEventListener('popstate', (event) => {
   isRestoringRoute = false;
 });
 
+const homeQuotes = [
+  { arabic: 'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا', meaning: 'Maka sesungguhnya bersama kesulitan ada kemudahan.', reference: 'QS. Al-Insyirah: 5' },
+  { arabic: 'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', meaning: 'Ingatlah, hanya dengan mengingat Allah hati menjadi tenteram.', reference: "QS. Ar-Ra'd: 28" },
+  { arabic: 'لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا', meaning: 'Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.', reference: 'QS. Al-Baqarah: 286' },
+  { arabic: 'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ', meaning: 'Barang siapa bertawakal kepada Allah, niscaya Allah akan mencukupkan keperluannya.', reference: 'QS. At-Talaq: 3' },
+  { arabic: 'لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ', meaning: 'Janganlah kamu berputus asa dari rahmat Allah.', reference: 'QS. Az-Zumar: 53' },
+  { arabic: 'إِنَّ اللَّهَ مَعَ الصَّابِرِينَ', meaning: 'Sesungguhnya Allah bersama orang-orang yang sabar.', reference: 'QS. Al-Baqarah: 153' },
+  { arabic: 'وَقُل رَّبِّ زِدْنِي عِلْمًا', meaning: 'Dan katakanlah, “Ya Tuhanku, tambahkanlah ilmu kepadaku.”', reference: 'QS. Taha: 114' },
+  { arabic: 'فَاذْكُرُونِي أَذْكُرْكُمْ', meaning: 'Maka ingatlah kepada-Ku, Aku pun akan ingat kepadamu.', reference: 'QS. Al-Baqarah: 152' }
+];
+
+function renderRandomHomeQuote() {
+  const lastIndex = Number(sessionStorage.getItem('lastHomeQuoteIndex') ?? -1);
+  const availableQuotes = homeQuotes.map((_, index) => index).filter(index => index !== lastIndex);
+  const index = availableQuotes[Math.floor(Math.random() * availableQuotes.length)];
+  const quote = homeQuotes[index];
+
+  document.getElementById('homeQuoteArabic').textContent = quote.arabic;
+  document.getElementById('homeQuoteMeaning').textContent = quote.meaning;
+  document.getElementById('homeQuoteReference').textContent = quote.reference;
+  sessionStorage.setItem('lastHomeQuoteIndex', index);
+}
+
 window.addEventListener("load", () => {
+  renderRandomHomeQuote();
   updateTopBar("Home");
   if (!window.location.hash && !window.location.search) replaceRouteState('homePage');
   renderSmartBanner();

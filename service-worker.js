@@ -1,11 +1,13 @@
 // Ganti versi ini SETIAP KALI lu nge-push perubahan besar ke GitHub!
-const CACHE_NAME = 'alquran-cache-v14';
+const CACHE_NAME = 'alquran-cache-v16';
 
 // 1. PRE-CACHE: Daftarkan file statis UI, KECUALI mesin OTA Update
 const urlsToCache = [
   '/',
   '/index.html',
   '/kalender.html',
+  '/kalender-jawa.html',
+  '/yasin-tahlil.html',
   '/tahlil.json',
   '/hadroh.json',
   '/tasbih/index.html',
