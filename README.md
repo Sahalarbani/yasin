@@ -30,7 +30,7 @@ A modern, lightweight Islamic Super App built with a hybrid architecture: an HTM
 The Tahlil content is loaded from `tahlil.json`. Surah Yasin is requested from `https://equran.id/api/v2/surat/36` and can be served from the Service Worker cache after it has been opened online.
 
 ## Offline Strategy
-The Service Worker uses `alquran-cache-v16` and pre-caches core static assets, including:
+The Service Worker uses `alquran-cache-v17` and pre-caches core static assets, including:
 - `index.html`
 - `yasin-tahlil.html`
 - `tahlil.json`

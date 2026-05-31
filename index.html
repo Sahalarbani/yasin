@@ -27,7 +27,7 @@
 
     body {
       font-family: var(--font-sans); background-color: var(--ios-bg-primary); color: var(--ios-text-main);
-      margin: 0; padding-top: 54px; padding-bottom: calc(90px + env(safe-area-inset-bottom));
+      margin: 0; padding-top: env(safe-area-inset-top); padding-bottom: calc(90px + env(safe-area-inset-bottom));
       -webkit-font-smoothing: antialiased; transition: background-color 0.3s ease, color 0.3s ease;
     }
 
@@ -113,6 +113,23 @@
     }
     .dynamic-pill.visible { transform: translateY(0) scale(1); opacity: 1; }
     .dynamic-pill.expanded-view { bottom: calc(24px + env(safe-area-inset-bottom)); }
+
+    .detail-toolbar {
+      position: fixed; bottom: calc(24px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(140%);
+      display: flex; align-items: center; gap: 4px; padding: 7px; border-radius: 999px; z-index: 998;
+      background-color: var(--ios-glass-bg); backdrop-filter: blur(25px) saturate(200%);
+      -webkit-backdrop-filter: blur(25px) saturate(200%); border: 0.5px solid var(--ios-glass-border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18); opacity: 0; pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .detail-toolbar.visible { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+    .detail-toolbar.audio-active { bottom: calc(96px + env(safe-area-inset-bottom)); }
+    .detail-toolbar button {
+      min-width: 46px; min-height: 42px; border: 0; border-radius: 999px; background: transparent;
+      color: var(--ios-blue); display: flex; align-items: center; justify-content: center; font-weight: 800;
+    }
+    .detail-toolbar button:active { background-color: var(--ios-gray-fill); }
+    .detail-toolbar .play-all { gap: 7px; padding: 0 13px; background-color: var(--ios-blue); color: #fff; font-size: 0.82rem; }
 
     .offcanvas-bottom { background-color: var(--ios-bg-primary); color: var(--ios-text-main); border-top-left-radius: 20px; border-top-right-radius: 20px; }
     .ios-list-group { background-color: var(--ios-bg-secondary); border-radius: 12px; overflow: hidden; }
@@ -213,24 +230,6 @@
 </head>
 <body class="dark-mode">
 
-<header class="ios-navbar" id="topAppBar">
-  <button class="ios-btn-text" id="btnBack" style="display: none;" onclick="navigateBack()">
-    <i class="bi bi-chevron-left"></i> Kembali
-  </button>
-  <div class="nav-title" id="appBarTitle">Al-Qur'an</div>
-  
-  <div class="d-flex align-items-center gap-3">
-    <div id="detailActions" style="display: none; align-items: center; gap: 15px;">
-      <button class="ios-btn-text" onclick="changeFontSize('decrease')"><i class="bi bi-dash-circle fs-5"></i></button>
-      <button class="ios-btn-text" onclick="changeFontSize('increase')"><i class="bi bi-plus-circle fs-5"></i></button>
-      <button class="ios-btn-text" onclick="playAllVerses()" title="Putar Semua"><i class="bi bi-play-circle-fill fs-4"></i></button>
-    </div>
-    <button class="ios-btn-text" id="btnSettings" data-bs-toggle="offcanvas" data-bs-target="#settingsSheet">
-      <i class="bi bi-gear-fill fs-5"></i>
-    </button>
-  </div>
-</header>
-
 <main class="container px-3 py-3">
   
   <div id="homePage" class="page active-page">
@@ -281,6 +280,10 @@
         <span class="app-icon indigo"><i class="bi bi-calendar2-week-fill"></i></span>
         <span><span class="app-name d-block">Kalender Jawa</span><span class="app-desc d-block">Weton, pasaran, libur, cuti bersama</span></span>
       </button>
+      <button class="app-tile" data-bs-toggle="offcanvas" data-bs-target="#settingsSheet">
+        <span class="app-icon gray"><i class="bi bi-gear-fill"></i></span>
+        <span><span class="app-name d-block">Pengaturan</span><span class="app-desc d-block">Qori, tampilan, azan, pembaruan</span></span>
+      </button>
     </div>
   </div>
 
@@ -322,11 +325,11 @@
     </div>
   </div>
 
-  <div id="tasbihDigitalPage" class="page" style="padding: 0; margin: -16px; height: calc(100vh - 54px);">
+  <div id="tasbihDigitalPage" class="page" style="padding: 0; margin: -16px; height: 100vh;">
     <iframe src="tasbih/index.html" id="tasbihFrame" style="width: 100%; height: 100%; border: none; border-radius: 20px;"></iframe>
   </div>
 
-  <div id="kalenderPage" class="page" style="padding: 0; margin: -16px; height: calc(100vh - 54px);">
+  <div id="kalenderPage" class="page" style="padding: 0; margin: -16px; height: 100vh;">
     <iframe src="kalender.html" id="kalenderFrame" style="width: 100%; height: 100%; border: none; border-radius: 20px;"></iframe>
   </div>
 
@@ -407,6 +410,14 @@
     <i class="bi bi-clock-fill"></i><span>Jadwal</span>
   </button>
 </nav>
+
+<div class="detail-toolbar" id="detailToolbar" aria-label="Kontrol bacaan surah">
+  <button onclick="changeFontSize('decrease')" aria-label="Perkecil teks">A-</button>
+  <button onclick="changeFontSize('increase')" aria-label="Perbesar teks">A+</button>
+  <button class="play-all" onclick="playAllVerses()" aria-label="Putar semua ayat">
+    <i class="bi bi-play-fill fs-5"></i><span>Putar Semua</span>
+  </button>
+</div>
 
 <div class="offcanvas offcanvas-bottom h-auto" tabindex="-1" id="settingsSheet">
   <div class="offcanvas-header border-bottom border-secondary pb-3">
@@ -644,7 +655,9 @@ function getSelectedQori() {
 
 function showMiniPlayer(show) {
   const player = document.getElementById("miniPlayer");
+  const toolbar = document.getElementById("detailToolbar");
   if (show) player.classList.add("visible"); else player.classList.remove("visible");
+  toolbar.classList.toggle("audio-active", show);
 }
 
 function playVerse(index) {
@@ -908,9 +921,7 @@ document.getElementById("darkModeToggle").addEventListener("click", toggleDarkMo
 
 function showLoading(show) { document.getElementById("loadingSpinner").style.display = show ? 'block' : 'none'; }
 function updateTopBar(title, showBack = false, showActions = false) {
-  document.getElementById("appBarTitle").innerText = title;
-  document.getElementById("btnBack").style.display = showBack ? 'block' : 'none';
-  document.getElementById("detailActions").style.display = showActions ? 'flex' : 'none';
+  // The WebView host handles back navigation; page titles are intentionally hidden.
 }
 function updateBottomNav(activeId) {
   document.querySelectorAll(".tab-item").forEach(el => el.classList.remove("active"));
@@ -928,6 +939,7 @@ function navigateTo(pageId, verseIndex = null, options = {}) {
   
   const bottomNav = document.getElementById("bottomNav");
   const miniPlayer = document.getElementById("miniPlayer");
+  document.getElementById("detailToolbar").classList.remove("visible");
   bottomNav.classList.remove("hidden");
   miniPlayer.classList.remove("expanded-view");
   
@@ -997,6 +1009,7 @@ document.getElementById("searchInput").addEventListener("input", e => {
 function openSurahDetail(nomor, namaLatin, targetAyah = null, options = {}) {
   updateTopBar(namaLatin, true, true);
   document.getElementById("bottomNav").classList.add("hidden"); document.getElementById("miniPlayer").classList.add("expanded-view"); 
+  document.getElementById("detailToolbar").classList.add("visible");
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active-page"));
   document.getElementById("detailPage").classList.add("active-page");
   window.scrollTo(0,0); loadSurahDetail(nomor, targetAyah);
