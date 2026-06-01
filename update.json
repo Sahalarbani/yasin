@@ -1,9 +1,9 @@
 {
   "created_by": "Sahal Arbani",
-  "version": "8.8.1",
-  "apk_version": 8,
-  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/8.8.1/alquran_pro.apk",
-  "tanggal_update": "19 Maret 2026",
+  "version": "9.9.1",
+  "apk_version": 9,
+  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/9.9.1/alquran_pro.apk",
+  "tanggal_update": "1 Juni 2026",
   "fitur_baru": [
     "+ add fitur bookmark",
     "+ add fitur repeat audio",
@@ -23,6 +23,9 @@
     "Ubah warna aksen di Pengaturan, seluruh elemen (termasuk Tasbih dan Kalender) akan otomatis tersinkronisasi."
   ],
   "bug": [
+    "Memperbaiki bug suara azan di Android 10.",
+    "Memperbaiki bug volume suara azan yang terlalu kecil.",
+    "Pembaruan dan perbaikan lainnya.",
     "Mencegah tampilan error default OS (ERR_NAME_NOT_RESOLVED) yang tidak profesional saat tidak ada koneksi internet.",
     "Menumpas Silent Drop (gagal unduh senyap) akibat pemblokiran ketat dari mesin DownloadManager bawaan Android 14.",
     "Pembersihan artefak arsitektur lama (BroadcastReceiver) untuk efisiensi beban kerja CPU dan manajemen memori.",
