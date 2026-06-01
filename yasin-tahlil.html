@@ -11,7 +11,7 @@
     :root {
       --bg-primary: #F2F2F7; --bg-secondary: #FFFFFF; --text-main: #000000;
       --text-muted: #8E8E93; --glass-bg: rgba(255,255,255,0.78); --glass-border: rgba(0,0,0,0.1);
-      --accent: #0A84FF; --accent-soft: rgba(10,132,255,0.12); --gray-fill: rgba(118,118,128,0.12);
+      --accent: #0A84FF; --accent-soft: rgba(10,132,255,0.12); --gray-fill: rgba(118,118,128,0.12); --reading-font-size: 2rem;
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; --font-arab: 'Amiri', serif;
     }
     body.dark-mode {
@@ -21,27 +21,16 @@
     }
     * { box-sizing: border-box; }
     body {
-      margin: 0; padding: calc(70px + env(safe-area-inset-top)) 16px 34px; background: var(--bg-primary);
+      margin: 0; padding: calc(14px + env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom)); background: var(--bg-primary);
       color: var(--text-main); font-family: var(--font-sans); -webkit-font-smoothing: antialiased;
     }
-    .ios-navbar {
-      position: fixed; top: 0; left: 0; right: 0; height: calc(54px + env(safe-area-inset-top));
-      padding: env(safe-area-inset-top) 16px 0; display: flex; align-items: center; justify-content: space-between;
-      background: var(--glass-bg); border-bottom: 0.5px solid var(--glass-border); z-index: 10;
-      backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%);
-    }
-    .nav-title { position: absolute; left: 50%; transform: translateX(-50%); font-size: 1.04rem; font-weight: 700; white-space: nowrap; }
-    .nav-btn { border: 0; background: transparent; color: var(--accent); font-size: 0.94rem; font-weight: 700; padding: 8px 0; cursor: pointer; }
-    .nav-btn:active { opacity: 0.6; }
-    .switch-btn { display: flex; align-items: center; gap: 6px; justify-content: flex-end; min-width: 66px; }
-    .intro {
-      margin-bottom: 16px; padding: 18px; border-radius: 22px; color: #FFF;
-      background: radial-gradient(circle at 95% 0%, rgba(255,255,255,0.2), transparent 30%), linear-gradient(135deg, #085F63, #099268);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
-    }
-    .intro-kicker { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; opacity: 0.78; text-transform: uppercase; }
-    .intro-title { margin: 8px 0 5px; font-size: 1.55rem; font-weight: 700; }
-    .intro-copy { margin: 0; font-size: 0.84rem; line-height: 1.5; opacity: 0.82; }
+    .reading-hero { margin: 0 0 16px; padding: 18px; min-height: 138px; display: flex; flex-direction: column; justify-content: space-between; border-radius: 24px; color: #fff; overflow: hidden; position: relative; background: radial-gradient(circle at 95% 0%, rgba(255,255,255,0.22), transparent 32%), linear-gradient(135deg, #075E54, #087F67 58%, #10A37F); box-shadow: 0 14px 32px rgba(0,0,0,0.2); }
+    .reading-hero::after { content: "۞"; position: absolute; right: 12px; bottom: -38px; color: rgba(255,255,255,0.14); font-family: var(--font-arab); font-size: 7rem; }
+    .reading-hero-copy { position: relative; z-index: 1; }
+    .reading-hero-kicker { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.74); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+    .reading-hero-title { margin: 9px 0 5px; font-size: 1.55rem; font-weight: 800; letter-spacing: -0.04em; }
+    .reading-hero-text { margin: 0; max-width: 260px; color: rgba(255,255,255,0.8); font-size: 0.8rem; line-height: 1.5; }
+    .reading-hero-status { position: relative; z-index: 1; color: rgba(255,255,255,0.7); font-size: 0.72rem; font-weight: 700; }
     .reading-card {
       margin-bottom: 14px; padding: 18px 16px; border-radius: 20px; background: var(--bg-secondary);
       border: 0.5px solid var(--glass-border); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
@@ -49,36 +38,46 @@
     .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
     .badge { padding: 6px 10px; border-radius: 999px; color: var(--accent); background: var(--accent-soft); font-size: 0.75rem; font-weight: 700; }
     .item-title { color: var(--accent); font-size: 0.82rem; font-weight: 700; text-align: right; }
-    .arabic { margin-bottom: 16px; color: var(--text-main); font-family: var(--font-arab); font-size: 2rem; line-height: 2.05; text-align: right; }
+    .arabic { margin-bottom: 16px; color: var(--text-main); font-family: var(--font-arab); font-size: var(--reading-font-size); line-height: 2.05; text-align: right; }
     .latin { margin-bottom: 8px; color: var(--accent); font-size: 0.86rem; font-weight: 500; line-height: 1.55; }
     .meaning { color: var(--text-muted); font-size: 0.88rem; line-height: 1.55; }
     .state { padding: 52px 18px; color: var(--text-muted); text-align: center; font-size: 0.9rem; line-height: 1.5; }
     .spinner { width: 30px; height: 30px; margin: 0 auto 12px; border: 3px solid var(--gray-fill); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     @media (min-width: 720px) { main { max-width: 760px; margin: auto; } .arabic { font-size: 2.2rem; } }
+    .reading-toolbar { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); transform: translateX(-50%); display: flex; align-items: center; gap: 5px; padding: 7px; border: 0.5px solid var(--glass-border); border-radius: 999px; background: var(--glass-bg); box-shadow: 0 12px 30px rgba(0,0,0,0.22); backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%); z-index: 20; }
+    .reading-toolbar button { min-height: 42px; padding: 0 13px; border: 0; border-radius: 999px; background: transparent; color: var(--text-muted); font-size: 0.78rem; font-weight: 800; font-family: var(--font-sans); white-space: nowrap; }
+    .reading-toolbar button.active { background: var(--accent); color: #fff; }
+    .reading-toolbar .zoom-btn { min-width: 42px; padding: 0 8px; color: var(--accent); font-size: 0.88rem; }
+    .reading-toolbar button:active { opacity: 0.65; }
   </style>
 </head>
 <body class="dark-mode">
-<header class="ios-navbar">
-  <button class="nav-btn" onclick="goBack()"><i class="bi bi-chevron-left"></i> Kembali</button>
-  <div class="nav-title" id="navTitle">Surah Yasin</div>
-  <button class="nav-btn switch-btn" id="switchButton" onclick="toggleSection()"><i class="bi bi-journal-text"></i> <span>Tahlil</span></button>
-</header>
-
 <main>
-  <section class="intro">
-    <div class="intro-kicker"><i class="bi bi-moon-stars-fill"></i> Ruang Bacaan</div>
-    <h1 class="intro-title" id="introTitle">Surah Yasin</h1>
-    <p class="intro-copy" id="introCopy">Baca Surah Yasin dengan teks Arab, latin, dan terjemahan Indonesia.</p>
+  <section class="reading-hero">
+    <div class="reading-hero-copy">
+      <div class="reading-hero-kicker"><i class="bi bi-moon-stars-fill"></i> Ruang Bacaan</div>
+      <h1 class="reading-hero-title" id="heroTitle">Surah Yasin</h1>
+      <p class="reading-hero-text" id="heroText">Baca Surah Yasin dengan teks Arab, latin, dan terjemahan Indonesia.</p>
+    </div>
+    <div class="reading-hero-status" id="heroStatus">83 ayat · Makkiyah</div>
   </section>
   <div id="content"><div class="state"><div class="spinner"></div>Memuat bacaan...</div></div>
 </main>
+
+<nav class="reading-toolbar" aria-label="Kontrol bacaan">
+  <button id="tabYasin" class="active" onclick="showSection('yasin')"><i class="bi bi-book-fill"></i> Yasin</button>
+  <button id="tabTahlil" onclick="showSection('tahlil')"><i class="bi bi-journal-text"></i> Tahlil</button>
+  <button class="zoom-btn" onclick="changeReadingSize('decrease')" aria-label="Perkecil teks Arab">A-</button>
+  <button class="zoom-btn" onclick="changeReadingSize('increase')" aria-label="Perbesar teks Arab">A+</button>
+</nav>
 
 <script>
   const API_V2_EQURAN = 'https://equran.id/api/v2';
   let activeSection = 'yasin';
   let yasinData = null;
   let tahlilData = null;
+  let readingFontSize = Number(localStorage.getItem('yasinTahlilFontSize')) || 2;
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
 
@@ -91,27 +90,31 @@
     if (localStorage.getItem('isDarkMode') === 'false') document.body.classList.remove('dark-mode');
     const savedColor = localStorage.getItem('appAccentColor');
     if (savedColor) document.documentElement.style.setProperty('--accent', savedColor);
-  }
-
-  function toggleSection() {
-    showSection(activeSection === 'yasin' ? 'tahlil' : 'yasin');
+    document.documentElement.style.setProperty('--reading-font-size', readingFontSize + 'rem');
   }
 
   async function showSection(section) {
     activeSection = section;
     const isYasin = section === 'yasin';
-    document.getElementById('navTitle').textContent = isYasin ? 'Surah Yasin' : 'Tahlil';
-    document.getElementById('introTitle').textContent = isYasin ? 'Surah Yasin' : 'Bacaan Tahlil';
-    document.getElementById('introCopy').textContent = isYasin
+    document.getElementById('tabYasin').classList.toggle('active', isYasin);
+    document.getElementById('tabTahlil').classList.toggle('active', !isYasin);
+    document.getElementById('heroTitle').textContent = isYasin ? 'Surah Yasin' : 'Bacaan Tahlil';
+    document.getElementById('heroText').textContent = isYasin
       ? 'Baca Surah Yasin dengan teks Arab, latin, dan terjemahan Indonesia.'
-      : 'Rangkaian bacaan tahlil lengkap dengan arti untuk dibaca secara berurutan.';
-    document.getElementById('switchButton').innerHTML = isYasin
-      ? '<i class="bi bi-journal-text"></i> <span>Tahlil</span>'
-      : '<i class="bi bi-book-fill"></i> <span>Yasin</span>';
+      : 'Rangkaian bacaan tahlil lengkap untuk dibaca secara berurutan.';
+    document.getElementById('heroStatus').textContent = isYasin ? '83 ayat · Makkiyah' : '47 bacaan · Tahlil lengkap';
     renderLoading();
     if (isYasin) await loadYasin();
     else await loadTahlil();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function changeReadingSize(direction) {
+    if (direction === 'increase' && readingFontSize < 3.4) readingFontSize += 0.2;
+    if (direction === 'decrease' && readingFontSize > 1.4) readingFontSize -= 0.2;
+    readingFontSize = Number(readingFontSize.toFixed(1));
+    document.documentElement.style.setProperty('--reading-font-size', readingFontSize + 'rem');
+    localStorage.setItem('yasinTahlilFontSize', readingFontSize);
   }
 
   function renderLoading() {
@@ -171,11 +174,6 @@
 
   function renderError(message) {
     document.getElementById('content').innerHTML = `<div class="state"><i class="bi bi-wifi-off" style="display:block;font-size:2rem;margin-bottom:10px"></i>${message}</div>`;
-  }
-
-  function goBack() {
-    if (window.history.length > 1) window.history.back();
-    else window.location.href = 'index.html#homePage';
   }
 </script>
 </body>

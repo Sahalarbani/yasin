@@ -9,6 +9,8 @@ function updateTime() {
 function updateDisplay() {
   countEl.innerText = count;
   targetDisplay.innerText = "Target: " + target;
+  document.getElementById("heroMode").innerText = currentModeName;
+  document.getElementById("heroProgress").innerText = count + " dari " + target + " hitungan";
   let percentage = (count / target) * 100;
   if (percentage > 100) percentage = 100;
   progressRing.style.background = `conic-gradient(var(--accent-color) ${percentage}%, var(--progress-bg) ${percentage}%)`;

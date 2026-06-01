@@ -79,6 +79,48 @@
     }
     .verse-card.active { border-color: var(--ios-blue); background-color: rgba(10, 132, 255, 0.05); }
 
+    .quran-hero { margin: 2px 0 16px; padding: 20px; border-radius: 26px; color: #fff; overflow: hidden; position: relative; background: linear-gradient(135deg, #075E54, #087F67 58%, #10A37F); box-shadow: 0 14px 32px rgba(0,0,0,0.2); }
+    .quran-hero::after { content: "۞"; position: absolute; right: 14px; bottom: -28px; font-family: var(--font-arab); font-size: 7rem; color: rgba(255,255,255,0.12); }
+    .quran-hero h1 { margin: 0 0 7px; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.04em; position: relative; z-index: 1; }
+    .quran-hero p { margin: 0; max-width: 250px; color: rgba(255,255,255,0.78); font-size: 0.82rem; line-height: 1.55; position: relative; z-index: 1; }
+    .quran-search-panel { margin-bottom: 18px; padding: 7px; display: flex; gap: 7px; border-radius: 17px; background: var(--ios-bg-secondary); border: 0.5px solid var(--ios-glass-border); }
+    .quran-search-panel .ios-search-bar { background: transparent; padding-top: 11px; padding-bottom: 11px; }
+    .quran-search-panel .btn-search-deep { border-radius: 12px; padding: 0 14px; white-space: nowrap; }
+    .quran-section-head { display: flex; align-items: center; justify-content: space-between; margin: 18px 3px 10px; }
+    .quran-section-head strong { font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .quran-section-head span { color: var(--ios-text-muted); font-size: 0.76rem; }
+    .surah-list { display: grid; gap: 9px; }
+    .surah-row { width: 100%; display: flex; align-items: center; gap: 13px; padding: 13px; border: 0.5px solid var(--ios-glass-border); border-radius: 18px; background: var(--ios-bg-secondary); color: var(--ios-text-main); text-align: left; transition: transform 0.2s ease, background-color 0.2s ease; }
+    .surah-row:active { transform: scale(0.985); background: var(--ios-gray-fill); }
+    .surah-number { width: 36px; height: 36px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 12px; background: rgba(10,132,255,0.11); color: var(--ios-blue); font-size: 0.77rem; font-weight: 800; }
+    .surah-copy { min-width: 0; flex: 1; }
+    .surah-name { margin-bottom: 3px; font-size: 0.98rem; font-weight: 800; }
+    .surah-meta { color: var(--ios-text-muted); font-size: 0.73rem; line-height: 1.35; }
+    .surah-arab { color: var(--ios-blue); font-family: var(--font-arab); font-size: 1.75rem; line-height: 1; }
+    .detail-surah-hero { margin: 2px 0 16px; padding: 18px; border-radius: 24px; color: #fff; position: relative; overflow: hidden; background: linear-gradient(135deg, #075E54, #087F67 60%, #10A37F); }
+    .detail-surah-hero::after { content: "۞"; position: absolute; right: 12px; bottom: -36px; color: rgba(255,255,255,0.13); font-family: var(--font-arab); font-size: 7rem; }
+    .detail-surah-title { margin: 0 0 4px; font-size: 1.45rem; font-weight: 800; letter-spacing: -0.04em; position: relative; z-index: 1; }
+    .detail-surah-meta { color: rgba(255,255,255,0.76); font-size: 0.78rem; position: relative; z-index: 1; }
+    .detail-download { margin-top: 13px; position: relative; z-index: 1; }
+    .verse-card { padding: 17px; border-radius: 20px; margin-bottom: 12px; border: 0.5px solid var(--ios-glass-border); }
+    .verse-card .text-arab { margin-bottom: 17px; line-height: 2.05; }
+    .verse-card .text-latin { font-size: 0.86rem; line-height: 1.6; }
+    .verse-card .text-indo { font-size: 0.88rem; line-height: 1.65; }
+    .verse-card > .d-flex:first-child { gap: 10px; margin-bottom: 16px !important; }
+    .verse-card .d-flex.gap-3 { gap: 5px !important; }
+    .verse-card .d-flex.gap-3 .ios-btn-text { min-width: 38px; height: 36px; padding: 0 10px; border-radius: 999px; background: var(--ios-gray-fill); color: var(--ios-text-main) !important; font-size: 0.76rem !important; font-weight: 700 !important; }
+    .verse-card .d-flex.gap-3 .ios-btn-text:last-child { min-width: 38px; padding: 0; background: var(--ios-blue); color: #fff !important; }
+    .verse-card .d-flex.gap-3 .ios-btn-text:active { opacity: 0.65; }
+
+    .feature-hero { margin: 2px 0 16px; padding: 18px; min-height: 138px; display: flex; flex-direction: column; justify-content: space-between; border-radius: 24px; color: #fff; overflow: hidden; position: relative; background: radial-gradient(circle at 95% 0%, rgba(255,255,255,0.22), transparent 32%), linear-gradient(135deg, #075E54, #087F67 58%, #10A37F); box-shadow: 0 14px 32px rgba(0,0,0,0.2); }
+    .feature-hero::after { content: "۞"; position: absolute; right: 12px; bottom: -38px; color: rgba(255,255,255,0.14); font-family: var(--font-arab); font-size: 7rem; }
+    .feature-hero-copy, .feature-hero-status { position: relative; z-index: 1; }
+    .feature-hero-kicker { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.74); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+    .feature-hero-title { margin: 9px 0 5px; font-size: 1.55rem; font-weight: 800; letter-spacing: -0.04em; }
+    .feature-hero-text { margin: 0; max-width: 270px; color: rgba(255,255,255,0.8); font-size: 0.8rem; line-height: 1.5; }
+    .feature-hero-status { color: rgba(255,255,255,0.7); font-size: 0.72rem; font-weight: 700; }
+    .hadroh-list .ios-card { margin-bottom: 10px; border: 0.5px solid var(--ios-glass-border); }
+
     .search-hit-card { background-color: var(--ios-bg-secondary); border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 0.5px solid var(--ios-glass-border); }
     .search-hit-surah { font-size: 0.85rem; font-weight: 600; color: var(--ios-blue); margin-bottom: 8px; }
 
@@ -288,17 +330,23 @@
   </div>
 
   <div id="quranPage" class="page">
-    <div class="search-container mt-2">
+    <section class="quran-hero">
+      <h1>Al-Qur'an</h1>
+      <p>Baca, dengarkan, dan lanjutkan hafalan dari 114 surah.</p>
+    </section>
+
+    <div class="quran-search-panel">
       <div class="search-input-wrapper">
         <i class="bi bi-search"></i>
-        <input type="text" id="searchInput" class="ios-search-bar" placeholder="Cari surah / kata kunci...">
+        <input type="text" id="searchInput" class="ios-search-bar" placeholder="Cari nama atau nomor surah">
       </div>
       <button class="btn-search-deep" onclick="executeDeepSearch()">Cari Ayat</button>
     </div>
-    
+
     <div id="smartBookmarkBanner" style="display: none;"></div>
-    
-    <div id="surahList" class="row g-2"></div>
+
+    <div class="quran-section-head"><strong>Daftar Surah</strong><span id="surahCount">114 surah</span></div>
+    <div id="surahList" class="surah-list"></div>
   </div>
 
   <div id="searchPage" class="page">
@@ -313,11 +361,27 @@
   </div>
 
   <div id="tahlilPage" class="page">
+    <section class="feature-hero">
+      <div class="feature-hero-copy">
+        <div class="feature-hero-kicker"><i class="bi bi-journal-text"></i> Ruang Bacaan</div>
+        <h1 class="feature-hero-title">Bacaan Tahlil</h1>
+        <p class="feature-hero-text">Rangkaian bacaan tahlil lengkap untuk dibaca secara berurutan.</p>
+      </div>
+      <div class="feature-hero-status">47 bacaan · Tahlil lengkap</div>
+    </section>
     <div id="tahlilContent"></div>
   </div>
 
   <div id="hadrohPage" class="page">
-    <div id="hadrohList"></div>
+    <section class="feature-hero">
+      <div class="feature-hero-copy">
+        <div class="feature-hero-kicker"><i class="bi bi-music-note-list"></i> Panduan Bacaan</div>
+        <h1 class="feature-hero-title">Daftar Hadroh</h1>
+        <p class="feature-hero-text">Urutan bacaan hadroh sebagai pengantar sebelum melanjutkan tahlil.</p>
+      </div>
+      <div class="feature-hero-status">Panduan ringkas · Siap dibaca</div>
+    </section>
+    <div id="hadrohList" class="hadroh-list"></div>
     <div class="mt-4 mb-4 text-center">
       <button class="ios-btn-text w-100 py-3 fw-bold" style="background-color: var(--ios-blue); color: white; border-radius: 14px;" onclick="navigateTo('tahlilPage', 3)">
         Lanjut Tahlil
@@ -991,13 +1055,13 @@ async function loadSurahList() {
 }
 
 function renderSurahList(list) {
+  document.getElementById("surahCount").innerText = list.length + " surah";
   document.getElementById("surahList").innerHTML = list.map(s => `
-    <div class="col-12 col-md-6">
-      <div class="ios-card" onclick="openSurahDetail(${s.nomor}, '${s.namaLatin.replace(/'/g, "\\'")}')">
-        <div><div class="fw-bold fs-5 mb-1">${s.namaLatin}</div><div style="font-size: 0.8rem; color: var(--ios-text-muted);">${s.arti} • ${s.jumlahAyat} Ayat</div></div>
-        <div class="fs-2" style="font-family: var(--font-arab); color: var(--ios-blue);">${s.nama}</div>
-      </div>
-    </div>
+    <button class="surah-row" onclick="openSurahDetail(${s.nomor}, &quot;${s.namaLatin.replace(/"/g, `&quot;`)}&quot;)">
+      <span class="surah-number">${String(s.nomor).padStart(2, "0")}</span>
+      <span class="surah-copy"><span class="surah-name d-block">${s.namaLatin}</span><span class="surah-meta d-block">${s.arti} · ${s.jumlahAyat} ayat</span></span>
+      <span class="surah-arab">${s.nama}</span>
+    </button>
   `).join("");
 }
 
@@ -1461,7 +1525,11 @@ async function loadSurahDetail(nomor, targetAyah = null) {
             }
         }
 
-        let headerHtml = `<div class="d-flex align-items-center mb-4">${offlineBtnHtml}</div>`;
+        let headerHtml = `<section class="detail-surah-hero">
+          <h1 class="detail-surah-title">Surah ${surahName}</h1>
+          <div class="detail-surah-meta">${dataJson.data.arti} · ${dataJson.data.jumlahAyat} ayat · ${dataJson.data.tempatTurun}</div>
+          ${offlineBtnHtml ? `<div class="detail-download">${offlineBtnHtml}</div>` : ``}
+        </section>`;
 
         let versesHtml = versesData.map((v, i) => `
           <div class="verse-card" id="verse-${i}">
