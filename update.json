@@ -3,7 +3,7 @@
   "version": "9.9.1",
   "apk_version": 9,
   "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/9.9.1/alquran_pro.apk",
-  "tanggal_update": "1 Juni 2026",
+  "tanggal_update": "2 Juni 2026",
   "fitur_baru": [
     "+ add fitur bookmark",
     "+ add fitur repeat audio",
@@ -15,7 +15,9 @@
     "Standalone Yasin & Tahlil: Menambahkan halaman yasin-tahlil.html agar bacaan Surah Yasin dan Tahlil lengkap dapat dibuka dari satu menu tanpa menambah beban index.html.",
     "Kalender Jawa: Menambahkan halaman kalender-jawa.html dengan weton, pasaran, neptu, navigasi bulan, serta tampilan weton hari ini.",
     "Libur Nasional & Cuti Bersama 2026: Kalender Jawa menyimpan 17 hari libur nasional dan 8 cuti bersama berdasarkan SKB 3 Menteri agar tetap dapat dilihat saat offline.",
-    "Offline Cache v16: Menambahkan halaman Yasin & Tahlil dan Kalender Jawa ke pre-cache Service Worker agar fitur utama tetap cepat dibuka."
+    "Consistent Prayer Schedule Hero: Halaman Jadwal Sholat kini memakai hero hijau yang konsisten dengan halaman utama, lengkap dengan jam real-time dan hitung mundur waktu sholat berikutnya.",
+    "Hijri Calendar UI Refresh: Kalender Masehi & Hijriah mendapatkan hero tanggal, kartu kontrol bulan, legenda warna, serta susunan grid yang lebih rapi tanpa mengubah logika kalender.",
+    "Offline Cache v24: Menaikkan versi cache Service Worker agar pembaruan UI Jadwal Sholat dan Kalender langsung dimuat setelah deployment."
   ],
   "petunjuk": [
     "Saat melakukan update aplikasi, pastikan izin Notifikasi telah diaktifkan agar progres pengunduhan muncul di status bar.",

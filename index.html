@@ -189,10 +189,25 @@
     .ios-badge { background-color: var(--ios-gray-fill); color: var(--ios-text-main); font-weight: 600; font-size: 0.85rem; padding: 6px 12px; border-radius: 20px; }
     .pickr .pcr-app { z-index: 10000 !important; }
     
-    .time-hero { font-size: 3.5rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 5px; color: var(--ios-text-main); }
-    .date-hero { font-size: 1rem; color: var(--ios-text-muted); margin-bottom: 15px; }
-    .countdown-box { background: var(--ios-gray-fill); border-radius: 12px; padding: 12px; display: inline-block; font-weight: 600; color: var(--ios-blue); }
-    .sholat-row { display: flex; justify-content: space-between; padding: 14px 16px; border-bottom: 0.5px solid var(--ios-glass-border); transition: all 0.3s; }
+    .prayer-hero { margin: 2px 0 14px; padding: 20px; min-height: 202px; display: flex; flex-direction: column; justify-content: space-between; border-radius: 26px; color: #fff; overflow: hidden; position: relative; background: radial-gradient(circle at 95% 0%, rgba(255,255,255,0.22), transparent 33%), linear-gradient(135deg, #075E54, #087F67 58%, #10A37F); box-shadow: 0 14px 32px rgba(0,0,0,0.2); }
+    .prayer-hero::after { content: "۞"; position: absolute; right: 12px; bottom: -46px; color: rgba(255,255,255,0.14); font-family: var(--font-arab); font-size: 8rem; }
+    .prayer-hero-top, .prayer-hero-bottom { position: relative; z-index: 1; }
+    .prayer-hero-kicker { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.76); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+    .time-hero { margin-top: 9px; color: #fff; font-size: 3.55rem; font-weight: 800; letter-spacing: -0.08em; line-height: 1; }
+    .date-hero { margin-top: 8px; color: rgba(255,255,255,0.82); font-size: 0.82rem; font-weight: 600; }
+    .countdown-box { display: inline-flex; align-items: center; gap: 7px; margin-top: 18px; padding: 9px 12px; border-radius: 999px; background: rgba(255,255,255,0.17); color: #fff; font-size: 0.76rem; font-weight: 800; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+    .prayer-actions { display: grid; grid-template-columns: minmax(0, 1fr) 88px; gap: 10px; margin-bottom: 16px; }
+    .prayer-location, .prayer-calendar-link { margin: 0; border: 0.5px solid var(--ios-glass-border); border-radius: 18px; background: var(--ios-bg-secondary); color: var(--ios-text-main); }
+    .prayer-location { min-width: 0; padding: 14px; }
+    .prayer-location-icon, .prayer-calendar-icon { display: grid; place-items: center; flex: 0 0 auto; width: 38px; height: 38px; border-radius: 12px; background: rgba(10,132,255,0.11); color: var(--ios-blue); }
+    .prayer-location-copy { min-width: 0; }
+    .prayer-location-title { font-size: 0.72rem; font-weight: 700; color: var(--ios-text-muted); }
+    .prayer-location-name { margin-top: 3px; overflow: hidden; color: var(--ios-text-main); font-size: 0.91rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+    .prayer-calendar-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px; font-size: 0.7rem; font-weight: 700; color: var(--ios-text-muted); }
+    .prayer-schedule-card { overflow: hidden; border: 0.5px solid var(--ios-glass-border); border-radius: 20px; background: var(--ios-bg-secondary); }
+    .prayer-schedule-head { display: flex; align-items: center; justify-content: space-between; padding: 15px 16px 10px; color: var(--ios-text-main); font-size: 0.88rem; font-weight: 800; }
+    .prayer-schedule-head span { color: var(--ios-text-muted); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+    .sholat-row { display: flex; justify-content: space-between; padding: 13px 16px; border-bottom: 0.5px solid var(--ios-glass-border); transition: all 0.3s; }
     .sholat-row:last-child { border-bottom: none; }
     .sholat-row.highlight { background-color: var(--ios-gray-fill); border-left: 4px solid var(--ios-blue); border-radius: 8px; border-bottom: none; margin: 4px 0; }
     .sholat-row.highlight .s-name, .sholat-row.highlight .s-time { color: var(--ios-blue); font-weight: 700; }
@@ -398,30 +413,36 @@
   </div>
 
   <div id="jadwalPage" class="page">
-    <div class="text-center mt-3 mb-4">
-      <div class="time-hero" id="realTimeClock">--:--:--</div>
-      <div class="date-hero" id="realTimeDate">Memuat tanggal...</div>
-      <div class="countdown-box" id="sholatCountdown">Memuat waktu sholat...</div>
-    </div>
+    <section class="prayer-hero">
+      <div class="prayer-hero-top">
+        <div class="prayer-hero-kicker"><i class="bi bi-moon-stars-fill"></i> Jadwal Sholat</div>
+        <div class="time-hero" id="realTimeClock">--:--:--</div>
+        <div class="date-hero" id="realTimeDate">Memuat tanggal...</div>
+      </div>
+      <div class="prayer-hero-bottom">
+        <div class="countdown-box"><i class="bi bi-clock-fill"></i><span id="sholatCountdown">Memuat waktu sholat...</span></div>
+      </div>
+    </section>
 
-    <div class="d-flex gap-2 mb-4">
-      <div class="ios-card flex-grow-1 mb-0" data-bs-toggle="offcanvas" data-bs-target="#locationSheet">
+    <div class="prayer-actions">
+      <div class="ios-card prayer-location" data-bs-toggle="offcanvas" data-bs-target="#locationSheet">
         <div class="d-flex align-items-center">
-          <i class="bi bi-geo-alt-fill fs-3 me-3" style="color: var(--ios-blue);"></i>
-          <div>
-            <div class="fw-bold" style="font-size: 1.05rem;">Lokasi Saat Ini</div>
-            <div style="color: var(--ios-text-muted); font-size: 0.85rem;" id="currentLocationName">Memuat lokasi...</div>
+          <span class="prayer-location-icon me-3"><i class="bi bi-geo-alt-fill"></i></span>
+          <div class="prayer-location-copy">
+            <div class="prayer-location-title">Lokasi Saat Ini</div>
+            <div class="prayer-location-name" id="currentLocationName">Memuat lokasi...</div>
           </div>
         </div>
       </div>
       
-      <button class="ios-card mb-0 d-flex flex-column justify-content-center align-items-center" style="width: 85px; padding: 10px; border: none; background: var(--ios-bg-secondary);" onclick="navigateTo('kalenderPage')">
-        <i class="bi bi-calendar3 fs-4" style="color: var(--ios-blue); margin-bottom: 4px;"></i>
-        <span style="font-size: 0.7rem; font-weight: 600; color: var(--ios-text-muted);">Kalender</span>
+      <button class="prayer-calendar-link" onclick="navigateTo('kalenderPage')">
+        <span class="prayer-calendar-icon"><i class="bi bi-calendar3"></i></span>
+        <span>Kalender</span>
       </button>
     </div>
 
-    <div class="ios-list-group">
+    <div class="prayer-schedule-card">
+      <div class="prayer-schedule-head">Waktu Sholat <span>Hari ini</span></div>
       <div class="sholat-row" id="row-imsak"><span class="s-name">Imsak</span><span class="s-time" id="time-imsak">--:--</span></div>
       <div class="sholat-row" id="row-subuh"><span class="s-name">Subuh</span><span class="s-time" id="time-subuh">--:--</span></div>
       <div class="sholat-row" id="row-terbit"><span class="s-name">Terbit</span><span class="s-time" id="time-terbit">--:--</span></div>

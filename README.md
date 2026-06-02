@@ -30,7 +30,7 @@ A modern, lightweight Islamic Super App built with a hybrid architecture: an HTM
 The Tahlil content is loaded from `tahlil.json`. Surah Yasin is requested from `https://equran.id/api/v2/surat/36` and can be served from the Service Worker cache after it has been opened online.
 
 ## Offline Strategy
-The Service Worker uses `alquran-cache-v21` and pre-caches core static assets, including:
+The Service Worker uses `alquran-cache-v24` and pre-caches core static assets, including:
 - `index.html`
 - `yasin-tahlil.html`
 - `tahlil.json`
@@ -65,7 +65,9 @@ update-modal.html     # OTA update modal content
 - Added randomized Quran quote hero on the homepage.
 - Added a standalone `Yasin & Tahlil` page with fixed navbar switching.
 - Added a standalone Javanese calendar with offline 2026 holiday and collective leave data.
-- Added standalone pages to Service Worker pre-cache and bumped the cache version to `v16`.
+- Refreshed the Prayer Schedule page with a consistent green hero, real-time clock, next-prayer countdown, and cleaner schedule cards.
+- Refactored the Hijri Calendar UI with a matching date hero, compact month controls, a cleaner calendar grid, and a color legend without changing calendar logic.
+- Bumped the Service Worker cache version to `v24` so the refreshed UI is loaded after deployment.
 
 ## Deployment
 The frontend is hosted through GitHub Pages and loaded by the native Android client. Update `CACHE_NAME` in `service-worker.js` whenever a significant frontend release changes pre-cached assets.

@@ -8,119 +8,126 @@
   <style>
     :root {
       --bg-primary: #F2F2F7; --bg-secondary: #FFFFFF; --text-main: #000000;
-      --text-muted: #8E8E93; --accent: #0A84FF; --danger: #FF3B30; --success: #34C759; --border: rgba(0,0,0,0.1);
+      --text-muted: #8E8E93; --accent: #0A84FF; --danger: #FF3B30; --success: #34C759;
+      --border: rgba(0,0,0,0.1); --soft-fill: rgba(118,118,128,0.1);
     }
     body.night {
       --bg-primary: #000000; --bg-secondary: #1C1C1E; --text-main: #FFFFFF;
-      --text-muted: #EBEBF5; --border: rgba(255,255,255,0.15);
+      --text-muted: rgba(235,235,245,0.62); --border: rgba(255,255,255,0.15); --soft-fill: rgba(118,118,128,0.2);
     }
+    * { box-sizing: border-box; }
     body {
-      margin: 0; padding: 20px; background: var(--bg-primary); color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      transition: background-color 0.3s ease, color 0.3s ease; padding-bottom: 40px;
+      margin: 0; padding: 16px 16px 40px; background: var(--bg-primary); color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
-    
-    .today-panel {
-      background: var(--bg-secondary); border-radius: 20px; padding: 20px; text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 0.5px solid var(--border);
+    .calendar-hero {
+      min-height: 176px; margin-bottom: 14px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;
+      border-radius: 26px; overflow: hidden; position: relative; color: #FFF;
+      background: radial-gradient(circle at 95% 0%, rgba(255,255,255,0.22), transparent 33%), linear-gradient(135deg, #075E54, #087F67 58%, #10A37F);
+      box-shadow: 0 14px 32px rgba(0,0,0,0.2);
     }
-    .today-masehi { font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
-    .today-hijri { font-size: 1rem; font-weight: 600; color: var(--accent); }
-    
-    .controls-wrapper {
-      background: var(--bg-secondary); border-radius: 20px; padding: 15px; margin-bottom: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 0.5px solid var(--border);
+    .calendar-hero::after { content: "۞"; position: absolute; right: 12px; bottom: -43px; color: rgba(255,255,255,0.14); font-size: 8rem; line-height: 1; }
+    .hero-copy, .hero-status { position: relative; z-index: 1; }
+    .hero-kicker { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.76); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+    .today-masehi { margin-top: 10px; color: #FFF; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1.2; }
+    .today-hijri { margin-top: 6px; color: rgba(255,255,255,0.84); font-size: 0.92rem; font-weight: 700; }
+    .hero-status { display: inline-flex; align-items: center; align-self: flex-start; gap: 7px; padding: 8px 11px; border-radius: 999px; background: rgba(255,255,255,0.17); color: rgba(255,255,255,0.9); font-size: 0.73rem; font-weight: 800; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+    .controls-wrapper, .calendar-shell, .holiday-panel {
+      background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .controls-wrapper { padding: 14px; margin-bottom: 12px; }
+    .section-kicker { margin: 0 2px 11px; color: var(--text-muted); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+    .header { display: grid; grid-template-columns: 40px minmax(0,1fr) 40px; gap: 8px; align-items: center; margin-bottom: 11px; }
     .month-year-picker {
-      background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-main);
-      padding: 8px 16px; border-radius: 12px; font-weight: 600; font-size: 1.05rem;
-      appearance: none; outline: none; text-align: center; width: 60%;
+      width: 100%; min-width: 0; padding: 9px 6px; border: 1px solid var(--border); border-radius: 12px;
+      appearance: none; outline: none; background: var(--bg-primary); color: var(--text-main); text-align: center; font-size: 0.94rem; font-weight: 750;
     }
     .nav-btn {
-      background: var(--bg-primary); border: 1px solid var(--border); color: var(--accent);
-      width: 40px; height: 40px; border-radius: 12px; font-size: 1.2rem;
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 12px;
+      background: var(--soft-fill); color: var(--accent); cursor: pointer; font-size: 1.05rem;
     }
-    .nav-btn:active { opacity: 0.7; }
-    
-    .adj-container { display: flex; align-items: center; justify-content: space-between; background: var(--bg-primary); border-radius: 12px; padding: 8px 12px; }
-    .adj-title { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
-    .adj-controls { display: flex; align-items: center; gap: 10px; }
-    .adj-btn { background: transparent; border: none; color: var(--accent); font-size: 1.2rem; cursor: pointer; padding: 0 5px;}
-    .adj-value { font-weight: 700; font-size: 0.95rem; width: 40px; text-align: center; }
-
-    .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-    .day-name { text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; }
+    .nav-btn:active, .adj-btn:active { opacity: 0.65; }
+    .adj-container { display: flex; align-items: center; justify-content: space-between; padding: 9px 10px; border-radius: 12px; background: var(--bg-primary); }
+    .adj-title { color: var(--text-muted); font-size: 0.74rem; font-weight: 700; }
+    .adj-controls { display: flex; align-items: center; gap: 7px; }
+    .adj-btn { padding: 0 3px; border: 0; background: transparent; color: var(--accent); cursor: pointer; font-size: 1.12rem; }
+    .adj-value { width: 28px; color: var(--text-main); text-align: center; font-size: 0.85rem; font-weight: 800; }
+    .calendar-shell { padding: 13px 11px 11px; }
+    .grid { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 5px; }
+    .day-name { padding: 1px 0 6px; color: var(--text-muted); text-align: center; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
     .day-name.sunday { color: var(--danger); }
     .day-name.friday { color: var(--success); }
-    
     .cell {
-      background: var(--bg-secondary); border-radius: 12px; padding: 8px 2px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05); min-height: 65px; position: relative; border: 1px solid transparent;
+      min-height: 58px; padding: 8px 2px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      border: 1px solid transparent; border-radius: 11px; position: relative; background: var(--bg-primary);
     }
-    .cell.empty { background: transparent; box-shadow: none; border: none; }
-    
-    .cell.today { border-color: var(--accent); background: rgba(10, 132, 255, 0.05); }
+    .cell.empty { visibility: hidden; }
+    .cell.today { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
     .cell.today .gregorian { color: var(--accent); }
-    
-    .cell.holiday { border-color: var(--danger); }
+    .cell.holiday { background: rgba(255,59,48,0.1); }
     .cell.holiday .gregorian { color: var(--danger); }
-    .holiday-dot { width: 4px; height: 4px; background: var(--danger); border-radius: 50%; position: absolute; top: 4px; right: 4px; }
-    
-    .cell.friday { border-color: var(--success); }
     .cell.friday .gregorian { color: var(--success); }
-    
-    .gregorian { font-size: 1.1rem; font-weight: 700; line-height: 1; margin-bottom: 6px; color: var(--text-main); }
-    .hijri { font-size: 1.1rem; font-weight: 600; color: var(--accent); text-align: center; line-height: 1; font-family: 'Amiri', serif; }
-    
-    .holiday-panel {
-      background: var(--bg-secondary); border-radius: 20px; padding: 20px; margin-top: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 0.5px solid var(--border);
-    }
-    .holiday-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; color: var(--text-main); }
-    .holiday-list { list-style: none; padding: 0; margin: 0; }
+    .holiday-dot { width: 5px; height: 5px; border-radius: 50%; position: absolute; top: 5px; right: 5px; background: var(--danger); }
+    .gregorian { margin-bottom: 6px; color: var(--text-main); font-size: 1rem; font-weight: 800; line-height: 1; }
+    .hijri { color: var(--accent); font-family: 'Amiri', serif; font-size: 1rem; font-weight: 700; line-height: 1; }
+    .calendar-legend { display: flex; flex-wrap: wrap; gap: 11px; padding: 12px 1px 1px; color: var(--text-muted); font-size: 0.68rem; font-weight: 700; }
+    .calendar-legend span { display: flex; align-items: center; gap: 5px; }
+    .calendar-legend i { width: 7px; height: 7px; border-radius: 50%; background: var(--danger); }
+    .calendar-legend i.friday { background: var(--success); }
+    .calendar-legend i.today { background: var(--accent); }
+    .holiday-panel { padding: 15px; margin-top: 12px; }
+    .holiday-title { display: flex; align-items: center; gap: 7px; margin-bottom: 11px; color: var(--text-main); font-size: 0.88rem; font-weight: 800; }
+    .holiday-list { margin: 0; padding: 0; list-style: none; }
     .holiday-item { display: flex; flex-direction: column; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
-    .holiday-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .h-date { font-size: 0.8rem; font-weight: 700; margin-bottom: 2px; display: flex; align-items: center;}
-    .h-name { font-size: 0.85rem; color: var(--text-muted); padding-left: 24px; }
+    .holiday-item:last-child { padding-bottom: 0; border-bottom: 0; }
+    .h-date { display: flex; align-items: center; margin-bottom: 3px; font-size: 0.76rem; font-weight: 800; }
+    .h-name { padding-left: 24px; color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; }
   </style>
 </head>
 <body class="night">
 
-  <div class="today-panel">
-    <div class="today-masehi" id="todayCE">Memuat...</div>
-    <div class="today-hijri" id="todayHijr">Memuat...</div>
-  </div>
+  <section class="calendar-hero">
+    <div class="hero-copy">
+      <div class="hero-kicker"><i class="bi bi-calendar2-week-fill"></i> Kalender Harian</div>
+      <div class="today-masehi" id="todayCE">Memuat...</div>
+      <div class="today-hijri" id="todayHijr">Memuat...</div>
+    </div>
+    <div class="hero-status"><i class="bi bi-moon-stars-fill"></i> Masehi & Hijriah</div>
+  </section>
 
-  <div class="controls-wrapper">
+  <section class="controls-wrapper">
+    <div class="section-kicker">Pilih Bulan</div>
     <div class="header">
-      <button class="nav-btn" onclick="changeMonth(-1)"><i class="bi bi-chevron-left"></i></button>
+      <button class="nav-btn" onclick="changeMonth(-1)" aria-label="Bulan sebelumnya"><i class="bi bi-chevron-left"></i></button>
       <input type="month" id="monthPicker" class="month-year-picker" onchange="renderCalendar()">
-      <button class="nav-btn" onclick="changeMonth(1)"><i class="bi bi-chevron-right"></i></button>
+      <button class="nav-btn" onclick="changeMonth(1)" aria-label="Bulan berikutnya"><i class="bi bi-chevron-right"></i></button>
     </div>
     
     <div class="adj-container">
       <div class="adj-title"><i class="bi bi-moon-stars-fill me-1"></i> Koreksi NU/Hilal</div>
       <div class="adj-controls">
-        <button class="adj-btn" onclick="changeAdj(-1)"><i class="bi bi-dash-circle-fill"></i></button>
+        <button class="adj-btn" onclick="changeAdj(-1)" aria-label="Kurangi koreksi hijriah"><i class="bi bi-dash-circle-fill"></i></button>
         <div class="adj-value" id="adjDisplay">0</div>
-        <button class="adj-btn" onclick="changeAdj(1)"><i class="bi bi-plus-circle-fill"></i></button>
+        <button class="adj-btn" onclick="changeAdj(1)" aria-label="Tambah koreksi hijriah"><i class="bi bi-plus-circle-fill"></i></button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="grid" id="dayNames">
-    <div class="day-name sunday">Ahad</div><div class="day-name">Sen</div><div class="day-name">Sel</div>
-    <div class="day-name">Rab</div><div class="day-name">Kam</div><div class="day-name friday">Jum</div><div class="day-name">Sab</div>
-  </div>
-  <div class="grid" id="calendarGrid"></div>
+  <section class="calendar-shell">
+    <div class="grid" id="dayNames">
+      <div class="day-name sunday">Ahad</div><div class="day-name">Sen</div><div class="day-name">Sel</div>
+      <div class="day-name">Rab</div><div class="day-name">Kam</div><div class="day-name friday">Jum</div><div class="day-name">Sab</div>
+    </div>
+    <div class="grid" id="calendarGrid"></div>
+    <div class="calendar-legend"><span><i class="today"></i> Hari ini</span><span><i></i> Ahad / libur</span><span><i class="friday"></i> Jumat</span></div>
+  </section>
 
-  <div class="holiday-panel" id="holidayPanel" style="display: none;">
-    <div class="holiday-title"><i class="bi bi-calendar-event-fill me-2" style="color: var(--accent);"></i> Hari Penting & Libur</div>
+  <section class="holiday-panel" id="holidayPanel" style="display: none;">
+    <div class="holiday-title"><i class="bi bi-calendar-event-fill" style="color: var(--accent);"></i> Hari Penting & Libur</div>
     <ul class="holiday-list" id="holidayList"></ul>
-  </div>
+  </section>
 
   <script>
     let currentDate = new Date();
