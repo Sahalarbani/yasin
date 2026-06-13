@@ -1,0 +1,58 @@
+{
+  "_meta": {
+    "version": "1.1.0",
+    "date": "2026-06-13",
+    "changelog": "Refactored structure into 7 granular segments for optimal mobile UI rendering. Added 'title' parameter to support native header UI components. Fixed typography and spacing issues in Latin transliteration."
+  },
+  "data": [
+    {
+      "segment_id": "tahlil_sec_01",
+      "title": "Isti'adzah, Basmalah & Pujian",
+      "arabic": "اَعُوذُ بِاللَّهِ مِنَ الشَّيْطَنِ الرَّحِيمِ بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ الْحَمدُ لِلَّهِ رَبِّ الْعَالَمِينَ. حَمْدَ الشَّاكِرِينَ. حَمدَ النَّاعِمِينَ. حَمَّدًا يُوَا فِي نِعَمَهُ وَيُكَا فِي مَزِيدَهُ يَا رَبَّنَا لَكَ الْحَمْدُ كَمَا يَنْبَغِي لِجَلَالِ وَجْهِكَ وَعَظِيمٍ سُلْطَانِكَ.",
+      "latin": "A'uudzu billaahi minasy syaithaanir rajiim, Bismillaahir rahmaanir rahiim. Alhamdulillaahi Rabbil 'aalamiin, hamdasy syaakiriin, hamdan naa'imiin, hamdan yuwaafii ni'amahuu wa yukaafii maziidah, yaa Rabbanaa lakal hamdu kamaa yambaghii li jalaali wajhika wa 'azhiimi sulthaanik.",
+      "translation": "Aku berlindung kepada Allah dari godaan setan yang terkutuk. Dengan menyebut nama Allah Yang Maha Pemurah lagi Maha Penyayang. Segala puji bagi Allah, Tuhan semesta alam, sebagaimana orang-orang yang bersyukur, dan orang yang memperoleh nikmat sama-sama memuji; dengan puji yang sebanding dengan nikmat-nikmat-Nya dan Dia menjamin tambahannya. Wahai Tuhan kami, hanya bagi-Mu segala puji sebagaimana apa yang patut bagi keluhuran Dzat-Mu dan keagungan kekuasaan-Mu."
+    },
+    {
+      "segment_id": "tahlil_sec_02",
+      "title": "Shalawat Nabi",
+      "arabic": "اللَّهُمَّ صَلِّ وَسَلَّمْ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِ سَيِّدِنَا مُحَمَّدٍ.",
+      "latin": "Allaahumma shalli wa sallim 'alaa sayyidinaa Muhammadiw wa 'alaa aali sayyidinaa Muhammad.",
+      "translation": "Ya Allah, berilah rahmat dan keselamatan atas penghulu kita Nabi Muhammad dan keluarganya."
+    },
+    {
+      "segment_id": "tahlil_sec_03",
+      "title": "Pengiriman Pahala & Doa Arwah",
+      "arabic": "اللَّهُمَّ تَقَبَّلْ وَأَوْصِلُ ثَوَابَ مَا قَرَأْنَاهُ مِنَ الْقُرْآنِ الْعَظِيمِ. وَمَا هَلَلْنَا وَمَا سَبَحْنَا وَ مَا اسْتَغْفَرْنَا وَمَا صَلَّيْنَا عَلَى سَيِّدِنَا مُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ هَدِيَّةً وَاصِلَةً وَرَحْمَةً نَازِلَةً وَبَرَكَةً شَامِلَةً إِلَى حَضَرَاتِ حَبِيبِنَا وَشَفِيعِنَا وَقُرَّةِ عَيْنِنَا سَيِّدِنَا وَمَوْلَانَا مُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ وَإِلَى جَمِيعِ إِخْوَانِهِ مِنَ الْأَنْبِيَاءِ وَالْمُرْسَلِينَ وَالْأَوْلِيَاءِ وَالشُّهَدَاءِ وَالصَّالِحِينَ وَالصَّحَابَةِ وَالتَّابِعِينَ وَالْعُلَمَاءِ الْعَامِلِينَ وَالْمُصَنِّفِينَ وَالْمُخْلِصِينَ وَجَمِيعِ الْمُجَاهِدِينَ فِي سَبِيلِ اللَّهِ رَبِّ الْعُلَمِينَ وَالْمَلَائِكَةِ الْمُقَرَّبِينَ ثُمَّ إِلَى جميعِ أَهْلِ الْقُبُورِ مِنَ الْمُسْلِمِينَ وَالْمُسْلِمَاتِ وَالْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ مِنْ مَشَارِقِ الْأَرْضِ وَمَغَارِ بِهَا بَرِهَا وَبَحْرِهَا خُصُوصًا إلى أبَاءِ نَا وَأُمَّهَاتِنَا وَاجْدَادِنَا وَجَدَ اتِنَا وَنَخْصُ خُصُوصًا من اجْتَمَعْنَاهُهُنَا بِسَبَبِهِ وَلَأَجْلِ الْمَرَّحُوْمِ.",
+      "latin": "Allaahumma taqabbal wa aushil tsawaaba maa qaara'naahu minal Qur-aanil 'azhiim, wa maa hallalnaa, wa maa sabbahnaa, wa mastaghfarnaa, wa maa shallainaa 'alaa sayyidinaa Muhammadin shallallaahu alaihi wa sallama hadiyyatan waashilatan wa rahmatan naazilataw wa barakatan syaamilah. Ilaa hadharaati habiibinaa wa syafii'inaa wa qurrati 'aininaa sayyidinaa wa maulaanaa Muhammadin shallallaahu 'alaihi wa sallam, wa ilaa jamii'i ikhwaanihii minal ambiyaa-i wal mursaliina wal auliyaa-i wasy syuhadaa-i wash shaalihiina wash shahaabati wat taabi'iina wal 'ulamaa-il 'aamiliina wal mushannifiina wal mukhlishiina wa jamii'il mujaahidiina fii sabiilillaahi Rabbil 'aalamiina wal malaa-ikatil muqarrabiin, tsumma ilaa jamii-'i ahlil qubuuri minal muslimiina wal muslimaati wal mu'miniina wal mu'minaati mim masyaariqil ardhi wa maghaaribihaa barrihaa wa bahrihaa khushuushan ilaa aabaa-inaa wa ummahaatinaa wa ajdaadinaa wa jaddaatinaa wa nakhushshu khushuushan manij-tama'na haahunaa bisababihii wa li ajlil marhuum.",
+      "translation": "Ya Allah, terima dan sampaikanlah pahala bacaan Al-Qur'an yang telah kami baca, tahlil, tasbih, istighfar dan bacaan shalawat kami kepada penghulu kami Nabi Muhammad Saw, dengan hadiah yang bisa sampai dan rahmat yang turun, dan berkah yang cukup kepada Nabi kami, penolong dan buah mata kami, penghulu dan pemimpin kami, yaitu Nabi Muhammad Saw. Dan kepada semua kerabatnya dari golongan para Nabi dan Rasul, para wali, orang-orang yang mati syahid, orang-orang yang saleh, para sahabat, tabi'in, para ulama yang mengamalkan ilmunya, para pengarang, orang-orang yang ikhlas, dan semua pejuang di jalan Allah, Tuhan semesta alam, dan kepada para malaikat yang selalu mendekatkan diri kepada Allah SWT. Juga kepada seluruh ahli kubur dari kaum muslimin dan muslimat, mu'minin dan mu'minat dari belahan bumi sebelah timur dan barat, baik yang di daratan maupun yang di lautan, khususnya kepada bapak dan ibu kami, kakek dan nenek kami, dan kepada orang yang menyebabkan kami semua dapat berkumpul di sini, dan untuk keperluannya."
+    },
+    {
+      "segment_id": "tahlil_sec_04",
+      "title": "Doa Khusus Almarhum",
+      "arabic": "اَللَّهُمَّ إِنَّهُ نَزَلَ بِكَ وَانْتَ خَيْرٌ مَنْزُولٍ بِهِ. اَللَّهُمَّ إِنَّهُ فَقِيرٌ رَحْمَتِكَ وَأَنْتَ غَنِيٌّ عَنْ مُؤَاخَذَتِهِ وَعَذَا بِهِ فَاللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ وَ عَافِهِ وَاعْفُ عَنْهُ وَوَسَعٌ مَدْخَلَهُ اَللَّهُمَّ اغْسِلَهُ بِالْمَاءِ وَالثَّلْجِ وَالْبَرَدِ وَنَقِهِ مِنَ الذُّنُوبِ كَمَا يُنَقَّى الثَّوْبُ الأَبْيَضُ مِنَ الدَّنَسِ",
+      "latin": "Allahumma Innahuu nazala bika wa anta khairu manzuulin bih. Allaahumma innahuu faqiirun ilaa rahmatika wa anta ghaniyyun 'an mu-akhadzatihi wa 'adzaabih. Fallaahummagh-firlahuu warhamhuu wa 'aafihii wa'fu 'anhu wa wassi' madkhalah. Allaahummagh-silhu bil maa-i wats tsalji wal baradi wa naqqihii minadz dzunuubi kamaa yunaqqats tsaubul abyadhu minad danas.",
+      "translation": "Ya Allah sesungguhnya dia menuju kepada-Mu, dan Engkau adalah sebaik-baik tujuan. Ya Allah sesungguhnya dia sangat membutuhkan rahmat-Mu Engkau Mahakaya dan Engkau tidaklah berkepentingan untuk menyiksanya. Ya Allah, ampuni dan kasihanilah dia, sejahterakan dia, maafkanlah kesalahannya, muliakanlah tempat kembalinya, lapangkanlah tempat masuk (kubur)-nya dan cucilah dia dengan air bersih, es dan embun serta bersihkanlah dia (dari dosa) sebagaimana kain putih yang dibersihkan dari kotoran, lindungilah dia dari siksa kubur dan fitnahnya."
+    },
+    {
+      "segment_id": "tahlil_sec_05",
+      "title": "Doa Ampunan Umum",
+      "arabic": "اللَّهُمَّ اغْفِرْ لِحَيْنَا وَمَيِّتِنَا وَشَاهِدِنَا وَغَابِبِنَا وَصَغِيرِنَا وَكَبِيرِنَا وَذَكَرِنَا وَأَنْتَانَا اللَّهُمَّ مَنْ أَحْيَيْتَهُ مِنَّا فَأَحْبِهِ عَلَى الْإِسْلَامِ. تَوَفَّيْتَهُ مِنَّا فَتَوَقَهُ عَلَى الْإِيْمَانِ.",
+      "latin": "Allaahummaghfir lihayyinaa wa mayyitinaa wa syaahidinaa wa ghaa-ibinaa wa shaghiirinaa wa kabiirinaa wa dzakarinaa wa untsaanaa. Allaahumma man ahyaitahuu minnaa fa ahyihii 'alal islaam, wa man tawaffaitahuu minnaa fa tawaffahuu 'alal iimaan.",
+      "translation": "Ya Allah, ampunilah kami baik yang masih hidup, yang sudah mati, yang hadir, yang gaib, yang kecil, yang besar, yang laki-laki dan yang perempuan. Ya Allah, siapa saja yang telah Engkau hidupkan di antara kami maka hidupkanlah dia dengan menetapi agama Islam, dan barangsiapa yang Engkau matikan di antara kami, maka matikanlah di dalam keadaan iman."
+    },
+    {
+      "segment_id": "tahlil_sec_06",
+      "title": "Doa Perbaikan Agama & Dunia",
+      "arabic": "اللَّهُمَّ أَصْلِحْ لَنَا دِينَا الَّذِي هُوَ عِصْمَةُ أَمْرِنَا وَأَصْلِحْ لَنَا دُنْيَانَا الَّتِي فِيهَا مَعَاشُنَا وَأَصْلِحْ لَنَا آخِرَتَنَا الَّتِي إلَيْهَا مَعَادُنَا وَاجْعَلِ الْحَيَاةَ زِيَادَةً لَنَا فِي كُلِّ خَيْرٍ وَاجْعَلِ الْمَوْتَ رَاحَةً لَنَا مِنْ كُلِّ شَرٍّ",
+      "latin": "Allaahumma ashlih lanaa diinanal-ladzii huwa 'ishmatu amrinaa, wa ashlih lanaa dunyaanaa, al-latii fiihaa ma'aasyunaa, wa ashlih lanaa aakhiratanaa, al-latii ilaihaa ma'aadunaa, waj'alil hayaata ziyaadatan lanaa fii kulli khairin, waj'alil mauta raahatan lanaa min kulli syarrin.",
+      "translation": "Ya Allah perbaikilah agama kami yang kami jadikan pegangan bagi segala urusan kami, dan perbaikilah dunia kami yang di sanalah kehidupan kami, perbaikilah akhirat kami yang di sanalah tempat kami kembali, jadikanlah kehidupan ini sebagai tambahan bagi kami dalam segala kebaikan, dan jadikanlah kematian sebagai tempat istirahat bagi kami (untuk menjauh) dari segala keburukan."
+    },
+    {
+      "segment_id": "tahlil_sec_07",
+      "title": "Penutup & Sapu Jagad",
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً و فِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ سُبْحْنَ رَبِّكَ رَبِّ الْعِزَّةِ عَمَّا يَصِفُونَ وَسَلَامٌ عَلَى الْمُرْسَلِينَ وَالْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ الْفَاتِحَةُ",
+      "latin": "Rabbanaa aatina fid dun-yaa hasanataw wa fil aakhirati hasanataw wa qinaa 'adzaaban naar, subhaana rabbika rabbil 'izzati 'ammaa yashifuuna wa salaamun 'alal mursaliina wal hamdu lillaahi Rabbil 'aalamiin. Al-Faatihah : (Membaca surah Al-Faatihah)",
+      "translation": "Wahai Tuhan kami, berilah kami kebahagiaan di dunia dan kebahagiaan di akhirat serta selamatkanlah kami dari siksa neraka. Maha Suci Tuhanmu, Tuhan yang bersih dari apa yang mereka (orang-orang kafir) katakan. Dan kesejahteraan semoga senantiasa dilimpahkan kepada para utusan Allah. Segala puji bagi Allah, Tuhan semesta alam. Al-Faatihah .... (membaca surah Al-Faatihah)"
+    }
+  ]
+}

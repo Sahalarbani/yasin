@@ -1,0 +1,33 @@
+{
+  "created_by": "Sahal Arbani",
+  "version": "10.2.3",
+  "apk_version": 11,
+  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/v11.10.2.3/alquran_pro.apk",
+  "tanggal_update": "4 Juni 2026",
+  "fitur_baru": [
+    "Fix azan Subuh silent.",
+    "Tambah fallback audio azan.",
+    "Tambah native volume guard minimal 30%.",
+    "Default volume azan 70%.",
+    "Volume alarm dikembalikan setelah azan selesai.",
+    "Perbaikan AdzanService.",
+    "Perbaikan AdzanReceiver.",
+    "Autostart dialog tetap muncul sekali.",
+    "Stabil untuk rilis pengguna.",
+    "Offline Cache v25: Menaikkan versi cache Service Worker agar pembaruan langsung dimuat setelah deployment."
+  ],
+  "petunjuk": [
+    "Saat melakukan update aplikasi, pastikan izin Notifikasi telah diaktifkan agar progres pengunduhan muncul di status bar.",
+    "Saat berada di halaman Tasbih, gunakan tombol Volume fisik HP untuk berdzikir tanpa harus melihat layar.",
+    "Ubah warna aksen di Pengaturan, seluruh elemen (termasuk Tasbih dan Kalender) akan otomatis tersinkronisasi."
+  ],
+  "bug": [
+    "Memperbaiki bug suara azan di Android 10.",
+    "Memperbaiki bug volume suara azan yang terlalu kecil.",
+    "Pembaruan dan perbaikan lainnya.",
+    "Mencegah tampilan error default OS (ERR_NAME_NOT_RESOLVED) yang tidak profesional saat tidak ada koneksi internet.",
+    "Menumpas Silent Drop (gagal unduh senyap) akibat pemblokiran ketat dari mesin DownloadManager bawaan Android 14.",
+    "Pembersihan artefak arsitektur lama (BroadcastReceiver) untuk efisiensi beban kerja CPU dan manajemen memori.",
+    "Menyelesaikan Race Condition pada sinkronisasi warna Iframe Tasbih Digital."
+  ]
+}
