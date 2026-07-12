@@ -125,6 +125,14 @@
   <script src="core.js"></script>
 
   <script>
+    // ================================================================
+    // INIT COLOR FROM LOCALSTORAGE (FALLBACK SEBELUM SYNC DARI PARENT)
+    // ================================================================
+    const savedColor = localStorage.getItem('appAccentColor');
+    if (savedColor) {
+      document.documentElement.style.setProperty('--accent-color', savedColor);
+    }
+
     window.addEventListener('message', function(event) {
       const data = event.data;
       if (data.type === 'SYNC_THEME') {
@@ -133,12 +141,18 @@
       }
       if (data.type === 'SYNC_COLOR') {
         document.documentElement.style.setProperty('--accent-color', data.colorHex);
+        localStorage.setItem('appAccentColor', data.colorHex);
         if (typeof updateDisplay === "function") updateDisplay();
       }
       if (data.type === 'INCREMENT_COUNT') {
         if (typeof incrementCount === "function") incrementCount();
       }
     });
+
+    // Request sync from parent on load (async, non-blocking)
+    try {
+      window.parent.postMessage({ type: 'REQUEST_SYNC' }, '*');
+    } catch (e) {}
 
     if (typeof updateTime === 'function') {
       updateTime();
