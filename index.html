@@ -12,9 +12,9 @@
   
   <style>
     :root {
-      --ios-bg-primary: #F2F2F7; --ios-bg-secondary: #FFFFFF; --ios-text-main: #000000;
-      --ios-text-muted: #8E8E93; --ios-glass-bg: rgba(255, 255, 255, 0.75);
-      --ios-glass-border: rgba(0, 0, 0, 0.1); --ios-blue: #0A84FF; --ios-green: #34C759;
+          --ios-bg-primary: #F2F2F7; --ios-bg-secondary: #FFFFFF; --ios-text-main: #000000;
+          --ios-text-muted: #8E8E93; --ios-glass-bg: rgba(255, 255, 255, 0.75);
+          --ios-glass-border: rgba(0, 0, 0, 0.1); --ios-blue: #FF9F0A; --ios-green: #34C759;
       --ios-red: #FF3B30; --ios-warning: #FF9500; --ios-gray-fill: rgba(118, 118, 128, 0.12);
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; --font-arab: 'Amiri', serif;
     }
@@ -966,7 +966,7 @@ function syncToIframe() {
 window.addEventListener('message', (e) => { if (e.data && e.data.type === 'REQUEST_SYNC') syncToIframe(); });
 
 function initCustomColor() {
-  const defaultColor = '#0A84FF';
+  const defaultColor = '#FF9F0A';
   const savedColor = localStorage.getItem('appAccentColor');
   if (savedColor) document.documentElement.style.setProperty('--ios-blue', savedColor);
   
@@ -975,7 +975,7 @@ function initCustomColor() {
 
   const pickr = Pickr.create({
     el: container, theme: 'nano', position: 'top-start', default: savedColor || defaultColor,
-    swatches: ['#0A84FF', '#32D74B', '#FF453A', '#FF9F0A', '#BF5AF2', '#5E5CE6', '#FF375F', '#009688'],
+    swatches: ['#FF9F0A', '#0A84FF', '#32D74B', '#FF453A', '#BF5AF2', '#5E5CE6', '#FF375F', '#009688'],
     components: { preview: true, opacity: false, hue: true, interaction: { input: true, save: true } },
     i18n: { 'btn:save': 'Terapkan' }
   });
@@ -995,11 +995,11 @@ function initCustomColor() {
   });
   
   document.getElementById('resetColorBtn').addEventListener('click', () => {
-    document.documentElement.style.setProperty('--ios-blue', defaultColor);
+    document.documentElement.style.setProperty('--ios-blue', '#FF9F0A');
     localStorage.removeItem('appAccentColor');
-    pickr.setColor(defaultColor);
-    broadcastToIframe('tasbihFrame', 'SYNC_COLOR', { colorHex: defaultColor });
-    broadcastToIframe('kalenderFrame', 'SYNC_COLOR', { colorHex: defaultColor });
+    pickr.setColor('#FF9F0A');
+    broadcastToIframe('tasbihFrame', 'SYNC_COLOR', { colorHex: '#FF9F0A' });
+    broadcastToIframe('kalenderFrame', 'SYNC_COLOR', { colorHex: '#FF9F0A' });
   });
 }
 
