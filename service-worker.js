@@ -1,5 +1,5 @@
 // Ganti versi ini SETIAP KALI lu nge-push perubahan besar ke GitHub!
-const CACHE_NAME = 'alquran-cache-v28';
+const CACHE_NAME = 'alquran-cache-v30';
 
 // 1. PRE-CACHE: Daftarkan file statis UI, KECUALI mesin OTA Update
 const urlsToCache = [
@@ -49,7 +49,7 @@ self.addEventListener('fetch', event => {
   if (!event.request.url.startsWith('http')) return;
 
   // ROUTER 1: NETWORK-FIRST STRATEGY (Khusus OTA Engine)
-  // Memastikan update.json dan update-modal selalu fresh dari server GitHub
+  // Memastikan update.json dan update-modal.html selalu fresh dari server GitHub
   if (event.request.url.includes('update.json') || event.request.url.includes('update-modal.html')) {
     event.respondWith(
       fetch(event.request).catch(() => caches.match(event.request))
@@ -76,7 +76,7 @@ self.addEventListener('fetch', event => {
       }).catch(err => {
         console.error('Network gagal, fallback murni ke cache', err);
       });
-      
+     
       return cachedResponse || fetchPromise;
     })
   );
