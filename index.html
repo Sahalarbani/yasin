@@ -1276,7 +1276,7 @@ async function showUpdateModal(data, currentNativeVersion) {
       buttonHTML = `<button id="btnDownloadUpdate" disabled style="background-color: var(--ios-gray-fill); color: var(--ios-text-muted); border: none; border-radius: 12px; padding: 14px; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; cursor: not-allowed;">Aplikasi Sudah Terkini</button>`;
     } else {
       badgeHTML = `<span style="background-color: var(--ios-blue); color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;"><i class="bi bi-info-circle-fill me-1"></i> Versi Baru: ${data.version}</span>`;
-      buttonHTML = `<button id="btnDownloadUpdate" onclick="executeNativeUpdate('${data.apk_url}', ${data.apk_version})" style="background-color: var(--ios-blue); color: white; border: none; border-radius: 12px; padding: 14px; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.3);"><i class="bi bi-cloud-arrow-down-fill me-2"></i> Update Sekarang</button>`;
+      buttonHTML = `<button id="btnDownloadUpdate" onclick="executeNativeUpdate('${data.apk_url}', ${data.apk_version}, '${data.version}')" style="background-color: var(--ios-blue); color: white; border: none; border-radius: 12px; padding: 14px; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.3);"><i class="bi bi-cloud-arrow-down-fill me-2"></i> Update Sekarang</button>`;
     }
 
     document.getElementById("floatingContent").innerHTML = `
@@ -1296,12 +1296,16 @@ async function showUpdateModal(data, currentNativeVersion) {
   } catch (err) {}
 }
 
-function executeNativeUpdate(url, version) {
+function executeNativeUpdate(url, version, versionName) {
   const btn = document.getElementById('btnDownloadUpdate');
   btn.innerHTML = `<i class="bi bi-hourglass-split me-2"></i> Mengunduh... Lihat Status Bar`;
   btn.style.backgroundColor = 'var(--ios-warning)';
   btn.disabled = true;
-  if (typeof AndroidBridge !== 'undefined') { AndroidBridge.triggerUpdate(url, version); } else { window.open(url); }
+  if (typeof AndroidBridge !== 'undefined') { 
+    AndroidBridge.triggerUpdate(url, version, versionName || 'Unknown'); 
+  } else { 
+    window.open(url); 
+  }
 }
 
 let activeJadwal = {};
