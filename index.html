@@ -14,7 +14,7 @@
     :root {
       --ios-bg-primary: #F2F2F7; --ios-bg-secondary: #FFFFFF; --ios-text-main: #000000;
       --ios-text-muted: #8E8E93; --ios-glass-bg: rgba(255, 255, 255, 0.75);
-      --ios-glass-border: rgba(0, 0, 0, 0.1); --ios-blue: #0A84FF; --ios-green: #34C759;
+      --ios-glass-border: rgba(0, 0, 0, 0.1); --ios-blue: #FF9F0A; --ios-green: #34C759;
       --ios-red: #FF3B30; --ios-warning: #FF9500; --ios-gray-fill: rgba(118, 118, 128, 0.12);
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; --font-arab: 'Amiri', serif;
     }
@@ -543,6 +543,25 @@
     <div class="ios-list-group mb-4">
       <div class="ios-list-item d-flex justify-content-between align-items-center">
         <div>
+          <span class="fw-bold d-block">Volume Azan</span>
+          <span style="font-size: 0.75rem; color: var(--ios-text-muted);">Minimal 10% - Maksimal 100%</span>
+        </div>
+        <span id="azanVolumeValue" style="font-size: 0.85rem; color: var(--ios-blue); font-weight: 600;">10%</span>
+      </div>
+      <div class="ios-list-item" style="padding: 12px 16px;">
+        <input type="range" id="azanVolumeSlider" min="10" max="100" step="5" value="10" 
+               style="width: 100%; accent-color: var(--ios-blue);">
+      </div>
+      <div class="ios-list-item" style="padding: 12px 16px;">
+        <button class="ios-btn-text w-100 py-2 fw-bold" style="background-color: var(--ios-blue); color: white; border-radius: 10px;" onclick="testAzanVolume()">
+          <i class="bi bi-play-fill me-2"></i> Test Volume Azan
+        </button>
+      </div>
+    </div>
+
+    <div class="ios-list-group mb-4">
+      <div class="ios-list-item d-flex justify-content-between align-items-center">
+        <div>
           <span class="fw-bold d-block">Warna Aksen Aplikasi</span>
           <button id="resetColorBtn" class="ios-btn-text text-danger mt-1" style="font-size: 0.75rem; font-weight: 600;">
             <i class="bi bi-arrow-counterclockwise me-1"></i> Reset ke Default
@@ -610,6 +629,11 @@
       <div class="search-input-wrapper mt-3">
         <i class="bi bi-search"></i>
         <input type="text" id="searchCityInput" class="ios-search-bar" placeholder="Cari nama kota atau kabupaten...">
+      </div>
+      <div class="d-grid mt-2">
+        <button class="ios-btn-text w-100 py-2 fw-bold" style="background-color: var(--ios-blue); color: white; border-radius: 10px;" onclick="autoDetectLocationFromGPS()">
+          <i class="bi bi-geo-alt-fill me-2"></i> Gunakan GPS Sekarang
+        </button>
       </div>
     </div>
   </div>
@@ -907,6 +931,9 @@ function initAzanSetting() {
   const sw = document.getElementById("sw-azan");
   if (isAzanAuto) sw.classList.add("active");
   else sw.classList.remove("active");
+  
+  // Initialize Volume Azan UI
+  initAzanVolume();
 }
 
 function toggleAzanAuto() {
@@ -942,6 +969,109 @@ function testNativeAlarm() {
   }
 }
 
+function initAzanVolume() {
+  if (typeof AndroidBridge === 'undefined') return;
+  
+  const slider = document.getElementById('azanVolumeSlider');
+  const valueDisplay = document.getElementById('azanVolumeValue');
+  if (!slider || !valueDisplay) return;
+  
+  // Get saved volume from native (synchronous)
+  try {
+    const vol = AndroidBridge.getAzanVolume();
+    const percent = Math.round(vol * 100);
+    slider.value = percent;
+    valueDisplay.textContent = percent + '%';
+  } catch (e) {
+    slider.value = 10;
+    valueDisplay.textContent = '10%';
+  }
+  
+  slider.addEventListener('input', (e) => {
+    const vol = parseInt(e.target.value);
+    valueDisplay.textContent = vol + '%';
+  });
+  
+  slider.addEventListener('change', (e) => {
+    const vol = parseInt(e.target.value) / 100;
+    AndroidBridge.setAzanVolume(vol);
+  });
+}
+
+function testAzanVolume() {
+  if (typeof AndroidBridge === 'undefined') {
+    alert('AndroidBridge tidak tersedia');
+    return;
+  }
+  const vol = parseInt(document.getElementById('azanVolumeSlider').value) / 100;
+  AndroidBridge.triggerAzanTest(vol);
+}
+
+// ================================================================
+// GPS AUTO-DETECT LOCATION (Native Bridge + Nominatim + Fuzzy Match)
+// ================================================================
+async function autoDetectLocationFromGPS() {
+  if (typeof AndroidBridge === 'undefined' || !AndroidBridge.getGPSLocation) {
+    console.warn('AndroidBridge.getGPSLocation not available, skipping GPS auto-detect');
+    return;
+  }
+  
+  try {
+    showLoading(true);
+    const gpsResult = AndroidBridge.getGPSLocation();
+    if (!gpsResult) throw new Error('No GPS location');
+    
+    const [lat, lng] = gpsResult.split(',').map(Number);
+    if (!lat || !lng) throw new Error('Invalid GPS coords');
+    
+    // Reverse geocode via Nominatim
+    const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`);
+    const geoData = await geoRes.json();
+    
+    if (!geoData.address) throw new Error('No address data');
+    
+    // Extract city/kabupaten
+    const city = geoData.address.city || geoData.address.town || geoData.address.village || 
+                 geoData.address.county || geoData.address.state_district || '';
+    
+    // Fuzzy match against myquran API city list
+    const cityRes = await fetch(`${API_V3_MYQURAN}/kota/semua`);
+    const cityData = await cityRes.json();
+    const cities = cityData.data || [];
+    
+    let bestMatch = null;
+    let bestScore = 0;
+    
+    for (const c of cities) {
+      const name = c.lokasi.toLowerCase();
+      const target = city.toLowerCase();
+      // Simple fuzzy: check if target contains city name or vice versa
+      if (name.includes(target) || target.includes(name)) {
+        const score = Math.min(name.length, target.length) / Math.max(name.length, target.length);
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = c;
+        }
+      }
+    }
+    
+    if (bestMatch) {
+      localStorage.setItem('kotaId', bestMatch.id);
+      localStorage.setItem('selectedLocation', bestMatch.lokasi);
+      localStorage.setItem('hasAutoDetectedLocation', 'true');
+      document.getElementById('currentLocationName').textContent = bestMatch.lokasi;
+      showLoading(false);
+      // Re-init jadwal with new location
+      await initJadwalSholat();
+    } else {
+      throw new Error('No city match');
+    }
+  } catch (e) {
+    console.warn('GPS auto-detect failed:', e);
+    showLoading(false);
+  }
+}
+
 function broadcastToIframe(frameId, type, payload) {
   const frame = document.getElementById(frameId);
   if (frame && frame.contentWindow) { frame.contentWindow.postMessage({ type: type, ...payload }, '*'); }
@@ -961,16 +1091,17 @@ function syncToIframe() {
 window.addEventListener('message', (e) => { if (e.data && e.data.type === 'REQUEST_SYNC') syncToIframe(); });
 
 function initCustomColor() {
-  const defaultColor = '#0A84FF';
+  const defaultColor = '#FF9F0A';
   const savedColor = localStorage.getItem('appAccentColor');
   if (savedColor) document.documentElement.style.setProperty('--ios-blue', savedColor);
+  else document.documentElement.style.setProperty('--ios-blue', defaultColor);
   
   const container = document.querySelector('.color-picker-container');
   if(!container) return;
 
   const pickr = Pickr.create({
     el: container, theme: 'nano', position: 'top-start', default: savedColor || defaultColor,
-    swatches: ['#0A84FF', '#32D74B', '#FF453A', '#FF9F0A', '#BF5AF2', '#5E5CE6', '#FF375F', '#009688'],
+    swatches: ['#FF9F0A', '#0A84FF', '#32D74B', '#FF453A', '#BF5AF2', '#5E5CE6', '#FF375F', '#009688'],
     components: { preview: true, opacity: false, hue: true, interaction: { input: true, save: true } },
     i18n: { 'btn:save': 'Terapkan' }
   });
@@ -1319,6 +1450,11 @@ async function initJadwalSholat() {
   let kotaId = localStorage.getItem('kotaId') || '1632'; 
   let lokasiName = localStorage.getItem('selectedLocation') || 'Jakarta';
   document.getElementById('currentLocationName').textContent = lokasiName;
+  
+  // Auto-detect GPS location on first load (if not manually set)
+  if (!localStorage.getItem('hasAutoDetectedLocation') && typeof AndroidBridge !== 'undefined') {
+    await autoDetectLocationFromGPS();
+  }
   
   const today = moment().tz('Asia/Jakarta').format('YYYY/MM/DD');
   try {
