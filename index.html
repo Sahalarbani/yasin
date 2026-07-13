@@ -1019,8 +1019,9 @@ function testAzanVolume() {
 let cityListCache = null;
 
 function normalizeCityName(name) {
-  return name.toLowerCase()
-    .replace(/^(kab\.?|kabupaten|kota|kotamadya)\.?\s*/i, '')
+  return (name || '')
+    .toLowerCase()
+    .replace(/^(kab\.?|kabupaten|kota|kotamadya|daerah|wilayah)\.?\s*/i, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -1029,28 +1030,26 @@ async function autoDetectLocationFromGPS() {
   const loadingEl = document.getElementById('gpsLoadingIndicator');
   if (loadingEl) loadingEl.style.display = 'flex';
   
-  // Try native bridge first (newer APK)
   let gpsCoords = null;
   if (typeof AndroidBridge !== 'undefined' && AndroidBridge.getGPSLocation) {
     try {
       const gpsResult = AndroidBridge.getGPSLocation();
-      if (gpsResult) {
+      if (gpsResult && gpsResult.includes(',')) {
         const [lat, lng] = gpsResult.split(',').map(Number);
-        if (lat && lng) gpsCoords = { lat, lng };
+        if (!isNaN(lat) && !isNaN(lng)) gpsCoords = { lat, lng };
       }
     } catch (e) {
       console.warn('Native GPS bridge failed:', e);
     }
   }
   
-  // Fallback to browser geolocation (works on all APK versions)
   if (!gpsCoords && navigator.geolocation) {
     try {
       gpsCoords = await new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
           err => reject(err),
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
         );
       });
     } catch (e) {
@@ -1060,26 +1059,27 @@ async function autoDetectLocationFromGPS() {
   
   if (!gpsCoords) {
     if (loadingEl) loadingEl.style.display = 'none';
-    showToast('GPS tidak tersedia. Pilih lokasi manual.', 'warning');
+    if (typeof showToast === 'function') showToast('GPS tidak tersedia. Pilih lokasi manual.', 'warning');
     return;
   }
   
   try {
-    // Reverse geocode via Nominatim
     const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${gpsCoords.lat}&lon=${gpsCoords.lng}&zoom=10&addressdetails=1`);
     const geoData = await geoRes.json();
+    if (!geoData || !geoData.address) throw new Error('No address data');
     
-    if (!geoData.address) throw new Error('No address data');
-    
-    // Extract city/kabupaten - handle various Nominatim fields
-    const city = geoData.address.city || geoData.address.town || geoData.address.village || 
-                 geoData.address.municipality || geoData.address.city_district || 
-                 geoData.address.county || geoData.address.state_district || 
-                 geoData.address.suburb || '';
-    
-    if (!city) throw new Error('No city found in address');
-    
-    // Load city list (with cache)
+    // Kumpulkan semua kandidat nama kota / kabupaten dari Nominatim
+    const addr = geoData.address;
+    const candidates = [
+      addr.city,
+      addr.county,
+      addr.state_district,
+      addr.municipality,
+      addr.town,
+      addr.city_district,
+      geoData.display_name
+    ].filter(Boolean);
+
     if (!cityListCache) {
       const cityRes = await fetch(`${API_V3_MYQURAN}/kota/semua`);
       const cityData = await cityRes.json();
@@ -1087,59 +1087,56 @@ async function autoDetectLocationFromGPS() {
     }
     
     const cities = cityListCache;
-    const target = normalizeCityName(city);
-    
-    // Improved fuzzy matching with multiple strategies
     let bestMatch = null;
     let bestScore = 0;
     
     for (const c of cities) {
-      const name = normalizeCityName(c.lokasi);
-      
-      // Strategy 1: Exact match after prefix removal
-      if (name === target) {
-        bestMatch = c; bestScore = 1; break;
+      const cNorm = normalizeCityName(c.lokasi);
+      for (const cand of candidates) {
+        const candNorm = normalizeCityName(cand);
+        if (!candNorm) continue;
+        
+        // Exact match
+        if (candNorm === cNorm) {
+          bestMatch = c; bestScore = 1; break;
+        }
+        // Substring / Contains
+        if (candNorm.includes(cNorm) || cNorm.includes(candNorm)) {
+          const score = Math.min(cNorm.length, candNorm.length) / Math.max(cNorm.length, candNorm.length);
+          if (score > bestScore) { bestScore = score; bestMatch = c; }
+        }
+        // Word matching
+        const wordsC = cNorm.split(' ').filter(w => w.length > 2);
+        const wordsCand = candNorm.split(' ').filter(w => w.length > 2);
+        const overlap = wordsC.filter(w => wordsCand.includes(w)).length;
+        if (overlap > 0) {
+          const score = (overlap / Math.max(wordsC.length, wordsCand.length)) * 0.85;
+          if (score > bestScore) { bestScore = score; bestMatch = c; }
+        }
       }
-      
-      // Strategy 2: Contains match (substring)
-      if (name.includes(target) || target.includes(name)) {
-        const score = Math.min(name.length, target.length) / Math.max(name.length, target.length);
-        if (score > bestScore) { bestScore = score; bestMatch = c; }
-      }
-      
-      // Strategy 3: Word overlap
-      const targetWords = target.split(/\s+/).filter(w => w.length > 2);
-      const nameWords = name.split(/\s+/).filter(w => w.length > 2);
-      const overlap = targetWords.filter(w => nameWords.includes(w)).length;
-      if (overlap > 0) {
-        const score = overlap / Math.max(targetWords.length, nameWords.length) * 0.8;
-        if (score > bestScore) { bestScore = score; bestMatch = c; }
-      }
+      if (bestScore === 1) break;
     }
     
-    if (bestMatch && bestScore > 0.3) {
+    if (bestMatch && bestScore >= 0.25) {
       localStorage.setItem('kotaId', bestMatch.id);
       localStorage.setItem('selectedLocation', bestMatch.lokasi);
       localStorage.setItem('hasAutoDetectedLocation', 'true');
-      document.getElementById('currentLocationName').textContent = bestMatch.lokasi;
+      const elLoc = document.getElementById('currentLocationName');
+      if (elLoc) elLoc.textContent = bestMatch.lokasi;
       
       if (typeof showToast === 'function') {
-        showToast(`Lokasi otomatis: ${bestMatch.lokasi}`, 'success');
+        showToast(`Lokasi terdeteksi: ${bestMatch.lokasi}`, 'success');
       }
       
-      if (loadingEl) loadingEl.style.display = 'none';
       await initJadwalSholat();
       return;
     }
     
-    throw new Error('No city match (score too low)');
+    throw new Error('No city match');
   } catch (e) {
     console.warn('Auto-detect failed:', e);
-    if (typeof showToast === 'function') {
-      showToast('Deteksi otomatis gagal. Pilih manual.', 'warning');
-    }
+    if (typeof showToast === 'function') showToast('Deteksi otomatis gagal. Pilih manual.', 'warning');
   } finally {
-    const loadingEl = document.getElementById('gpsLoadingIndicator');
     if (loadingEl) loadingEl.style.display = 'none';
   }
 }
