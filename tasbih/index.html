@@ -125,37 +125,88 @@
   <script src="core.js"></script>
 
   <script>
+    // ===== HELPER: Konversi HEX ↔ HUE =====
+    function hexToHue(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      if (!result) return 30; // default orange hue ~30°
+      const r = parseInt(result[1], 16) / 255;
+      const g = parseInt(result[2], 16) / 255;
+      const b = parseInt(result[3], 16) / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h = 0;
+      if (max !== min) {
+        const d = max - min;
+        if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+        else if (max === g) h = (b - r) / d + 2;
+        else h = (r - g) / d + 4;
+        h = Math.round(h * 60);
+      }
+      return h;
+    }
+    
+    function hueToHex(hue) {
+      const h = hue / 360;
+      const hueToRgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = 0.5 < 0.5 ? 0.5 * (1 + 1) : 0.5 + 0.5 - 0.5 * 0.5; // lightness=0.5, saturation=1
+      const p = 2 * 0.5 - q;
+      const r = hueToRgb(p, q, h + 1/3);
+      const g = hueToRgb(p, q, h);
+      const b = hueToRgb(p, q, h - 1/3);
+      const toHex = x => Math.round(x * 255).toString(16).padStart(2, '0');
+      return '#' + toHex(r) + toHex(g) + toHex(b);
+    }
+
+    // State variable untuk hue slider
+    let savedHue = 0;
+    
     // Init theme and color immediately from localStorage
     (function initTasbihThemeAndColor() {
       const isDark = localStorage.getItem('isDarkMode') === 'true';
       if (isDark) document.body.classList.add("night");
       else document.body.classList.remove("night");
 
-      const savedColor = localStorage.getItem('appAccentColor') || '#FF9F0A';
-      document.documentElement.style.setProperty('--accent-color', savedColor);
+      // Sync from parent's appAccentColor (HEX) → tasbih's accentHue (0-360)
+      const savedHex = localStorage.getItem('appAccentColor') || '#FF9F0A';
+      const hue = parseInt(localStorage.getItem('accentHue'), 10) || hexToHue(savedHex);
+      savedHue = hue;
+      localStorage.setItem('accentHue', hue.toString());
+      localStorage.setItem('appAccentColor', savedHex);
+      document.documentElement.style.setProperty('--accent-color', `hsl(${hue}, 100%, 50%)`);
     })();
 
-    window.addEventListener('message', function(event) {
+    // Request sync from parent after DOM is ready
+    window.addEventListener('DOMContentLoaded', function() {
+      if (typeof updateDisplay === "function") updateDisplay();
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'REQUEST_SYNC' }, '*');
+      }
+    });
       const data = event.data;
       if (data.type === 'SYNC_THEME') {
         if (data.isDark) document.body.classList.add("night");
         else document.body.classList.remove("night");
       }
       if (data.type === 'SYNC_COLOR') {
-        document.documentElement.style.setProperty('--accent-color', data.colorHex);
+        // Parent sends HEX → convert to HUE, update slider & localStorage
+        const hue = hexToHue(data.colorHex);
+        savedHue = hue;
+        localStorage.setItem('accentHue', hue.toString());
+        localStorage.setItem('appAccentColor', data.colorHex);
+        document.documentElement.style.setProperty('--accent-color', `hsl(${hue}, 100%, 50%)`);
         if (typeof updateDisplay === "function") updateDisplay();
+        // Also update slider UI if visible
+        const hueSlider = document.getElementById('hueSlider');
+        if (hueSlider) hueSlider.value = hue;
       }
       if (data.type === 'INCREMENT_COUNT') {
         if (typeof incrementCount === "function") incrementCount();
-      }
-    });
-
-    window.addEventListener('DOMContentLoaded', function() {
-      const savedColor = localStorage.getItem('appAccentColor') || '#FF9F0A';
-      document.documentElement.style.setProperty('--accent-color', savedColor);
-      if (typeof updateDisplay === "function") updateDisplay();
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ type: 'REQUEST_SYNC' }, '*');
       }
     });
 

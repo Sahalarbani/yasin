@@ -15,6 +15,9 @@ let isVibrate = localStorage.getItem("isVibrate") === "false" ? false : true;
 let isZenMode = false;
 let isLocked = false; 
 
+// ====== WARNA AKSEN (HUE SLIDER) ======
+let savedHue = parseInt(localStorage.getItem("accentHue"), 10) || 30;
+
 // ====== SAMBUNGAN KE HTML (DOM) ======
 const countEl = document.getElementById("count");
 const progressRing = document.getElementById("progressRing");
