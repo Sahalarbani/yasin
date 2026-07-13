@@ -1,11 +1,11 @@
 {
   "created_by": "Sahal Arbani",
   "version": "11.2.4",
-  "apk_version": 13,
+  "apk_version": 14,
   "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/v11.2.4/Alquran_v11.2.4_final_signed.apk",
   "tanggal_update": "13 Juli 2026",
   "fitur_baru": [
-    "Versi APK naik ke v11.2.3 (build 12)",
+    "Versi APK naik ke v11.2.4 (build 14)",
     "Package Name: com.alquran.pro (SAME AS OLD - update seamless)",
     "GPS Auto-Detect Lokasi via AndroidBridge + Nominatim Reverse Geocode",
     "Fuzzy Match 518 kota API myquran (handle KAB./KOTA prefix)",
