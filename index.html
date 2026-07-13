@@ -1013,11 +1013,17 @@ function testAzanVolume() {
   const vol = parseInt(document.getElementById('azanVolumeSlider').value) / 100;
   AndroidBridge.triggerAzanTest(vol);
 }
-
 // ================================================================
 // GPS AUTO-DETECT LOCATION (Native Bridge + Nominatim + Fuzzy Match)
 // ================================================================
 let cityListCache = null;
+
+function normalizeCityName(name) {
+  return name.toLowerCase()
+    .replace(/^(kab\.?|kabupaten|kota|kotamadya)\.?\s*/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 async function autoDetectLocationFromGPS() {
   const loadingEl = document.getElementById('gpsLoadingIndicator');
@@ -1067,8 +1073,9 @@ async function autoDetectLocationFromGPS() {
     
     // Extract city/kabupaten - handle various Nominatim fields
     const city = geoData.address.city || geoData.address.town || geoData.address.village || 
+                 geoData.address.municipality || geoData.address.city_district || 
                  geoData.address.county || geoData.address.state_district || 
-                 geoData.address.municipality || geoData.address.suburb || '';
+                 geoData.address.suburb || '';
     
     if (!city) throw new Error('No city found in address');
     
@@ -1080,29 +1087,29 @@ async function autoDetectLocationFromGPS() {
     }
     
     const cities = cityListCache;
-    const target = city.toLowerCase().replace(/^(kab\.?|kota|kabupaten)\.?\s*/i, '');
+    const target = normalizeCityName(city);
     
     // Improved fuzzy matching with multiple strategies
     let bestMatch = null;
     let bestScore = 0;
     
     for (const c of cities) {
-      const name = c.lokasi.toLowerCase().replace(/^(kab\.?|kota|kabupaten)\.?\s*/i, '');
+      const name = normalizeCityName(c.lokasi);
       
       // Strategy 1: Exact match after prefix removal
       if (name === target) {
         bestMatch = c; bestScore = 1; break;
       }
       
-      // Strategy 2: Contains match
+      // Strategy 2: Contains match (substring)
       if (name.includes(target) || target.includes(name)) {
         const score = Math.min(name.length, target.length) / Math.max(name.length, target.length);
         if (score > bestScore) { bestScore = score; bestMatch = c; }
       }
       
       // Strategy 3: Word overlap
-      const targetWords = target.split(/\s+/);
-      const nameWords = name.split(/\s+/);
+      const targetWords = target.split(/\s+/).filter(w => w.length > 2);
+      const nameWords = name.split(/\s+/).filter(w => w.length > 2);
       const overlap = targetWords.filter(w => nameWords.includes(w)).length;
       if (overlap > 0) {
         const score = overlap / Math.max(targetWords.length, nameWords.length) * 0.8;
@@ -1120,6 +1127,7 @@ async function autoDetectLocationFromGPS() {
         showToast(`Lokasi otomatis: ${bestMatch.lokasi}`, 'success');
       }
       
+      if (loadingEl) loadingEl.style.display = 'none';
       await initJadwalSholat();
       return;
     }
