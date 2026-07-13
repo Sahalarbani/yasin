@@ -552,9 +552,18 @@
         <input type="range" id="azanVolumeSlider" min="10" max="100" step="5" value="10" 
                style="width: 100%; accent-color: var(--ios-blue);">
       </div>
+      <div class="ios-list-item d-flex justify-content-between align-items-center" style="padding: 12px 16px;">
+        <span style="font-size: 0.8rem; color: var(--ios-text-muted);">Volume HP (Alarm)</span>
+        <span id="systemAzanVolumeValue" style="font-size: 0.85rem; color: var(--ios-blue); font-weight: 600;">--%</span>
+      </div>
       <div class="ios-list-item" style="padding: 12px 16px;">
         <button class="ios-btn-text w-100 py-2 fw-bold" style="background-color: var(--ios-blue); color: white; border-radius: 10px;" onclick="testAzanVolume()">
           <i class="bi bi-play-fill me-2"></i> Test Volume Azan
+        </button>
+      </div>
+      <div class="ios-list-item" style="padding: 12px 16px;">
+        <button class="ios-btn-text w-100 py-2 fw-bold" style="background-color: var(--ios-green); color: white; border-radius: 10px;" onclick="syncAzanVolumeWithSystem()">
+          <i class="bi bi-arrow-repeat me-2"></i> Sync dengan Volume HP (Tombol Fisik)
         </button>
       </div>
     </div>
@@ -981,6 +990,7 @@ function initAzanVolume() {
   
   const slider = document.getElementById('azanVolumeSlider');
   const valueDisplay = document.getElementById('azanVolumeValue');
+  const systemValueDisplay = document.getElementById('systemAzanVolumeValue');
   if (!slider || !valueDisplay) return;
   
   // Get saved volume from native (synchronous)
@@ -994,6 +1004,15 @@ function initAzanVolume() {
     valueDisplay.textContent = '10%';
   }
   
+  // Get system alarm volume
+  try {
+    const sysVol = AndroidBridge.getSystemAzanVolumePercent();
+    const sysPercent = Math.round(sysVol * 100);
+    if (systemValueDisplay) systemValueDisplay.textContent = sysPercent + '%';
+  } catch (e) {
+    if (systemValueDisplay) systemValueDisplay.textContent = '--%';
+  }
+  
   slider.addEventListener('input', (e) => {
     const vol = parseInt(e.target.value);
     valueDisplay.textContent = vol + '%';
@@ -1002,7 +1021,56 @@ function initAzanVolume() {
   slider.addEventListener('change', (e) => {
     const vol = parseInt(e.target.value) / 100;
     AndroidBridge.setAzanVolume(vol);
+    
+    // Update system volume display after change
+    setTimeout(() => {
+      try {
+        const sysVol = AndroidBridge.getSystemAzanVolumePercent();
+        const sysPercent = Math.round(sysVol * 100);
+        if (systemValueDisplay) systemValueDisplay.textContent = sysPercent + '%';
+      } catch (e) {}
+    }, 300);
   });
+}
+
+function syncAzanVolumeWithSystem() {
+  if (typeof AndroidBridge === 'undefined') {
+    alert('AndroidBridge tidak tersedia');
+    return;
+  }
+  
+  const btn = event.target.closest('button');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i> Menyinkronkan...';
+  btn.disabled = true;
+  
+  try {
+    AndroidBridge.syncAzanVolumeWithSystem();
+    
+    // Update displays after sync
+    setTimeout(() => {
+      try {
+        const vol = AndroidBridge.getAzanVolume();
+        const percent = Math.round(vol * 100);
+        const slider = document.getElementById('azanVolumeSlider');
+        const valueDisplay = document.getElementById('azanVolumeValue');
+        if (slider) slider.value = percent;
+        if (valueDisplay) valueDisplay.textContent = percent + '%';
+        
+        const sysVol = AndroidBridge.getSystemAzanVolumePercent();
+        const sysPercent = Math.round(sysVol * 100);
+        const systemValueDisplay = document.getElementById('systemAzanVolumeValue');
+        if (systemValueDisplay) systemValueDisplay.textContent = sysPercent + '%';
+      } catch (e) {}
+    }, 500);
+  } catch (e) {
+    console.error('Sync error:', e);
+  }
+  
+  setTimeout(() => {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }, 1000);
 }
 
 function testAzanVolume() {
@@ -1444,7 +1512,7 @@ async function showUpdateModal(data, currentNativeVersion) {
       buttonHTML = `<button id="btnDownloadUpdate" disabled style="background-color: var(--ios-gray-fill); color: var(--ios-text-muted); border: none; border-radius: 12px; padding: 14px; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; cursor: not-allowed;">Aplikasi Sudah Terkini</button>`;
     } else {
       badgeHTML = `<span style="background-color: var(--ios-blue); color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;"><i class="bi bi-info-circle-fill me-1"></i> Versi Baru: ${data.version}</span>`;
-      buttonHTML = `<button id="btnDownloadUpdate" onclick="executeNativeUpdate('${data.apk_url}', ${data.apk_version})" style="background-color: var(--ios-blue); color: white; border: none; border-radius: 12px; padding: 14px; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.3);"><i class="bi bi-cloud-arrow-down-fill me-2"></i> Update Sekarang</button>`;
+      buttonHTML = `<button id="btnDownloadUpdate" onclick="executeNativeUpdate('${data.apk_url}', ${data.apk_version}, '${data.version}')" style="background-color: var(--ios-blue); color: white; border: none; border-radius: 12px; padding: 14px; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.3);"><i class="bi bi-cloud-arrow-down-fill me-2"></i> Update Sekarang</button>`;
     }
 
     document.getElementById("floatingContent").innerHTML = `
@@ -1464,12 +1532,20 @@ async function showUpdateModal(data, currentNativeVersion) {
   } catch (err) {}
 }
 
-function executeNativeUpdate(url, version) {
+function executeNativeUpdate(url, version, versionName = '11.2.4') {
   const btn = document.getElementById('btnDownloadUpdate');
   btn.innerHTML = `<i class="bi bi-hourglass-split me-2"></i> Mengunduh... Lihat Status Bar`;
   btn.style.backgroundColor = 'var(--ios-warning)';
   btn.disabled = true;
-  if (typeof AndroidBridge !== 'undefined') { AndroidBridge.triggerUpdate(url, version); } else { window.open(url); }
+  if (typeof AndroidBridge !== 'undefined') {
+    try {
+      AndroidBridge.triggerUpdate(url, version, versionName);
+    } catch (e) {
+      AndroidBridge.triggerUpdate(url, version);
+    }
+  } else {
+    window.open(url);
+  }
 }
 
 let activeJadwal = {};
