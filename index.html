@@ -635,6 +635,11 @@
           <i class="bi bi-geo-alt-fill me-2"></i> Gunakan GPS Sekarang
         </button>
       </div>
+      <!-- GPS Loading Indicator -->
+      <div id="gpsLoadingIndicator" class="text-center py-3" style="display: none;">
+        <div class="loading-spinner mb-2" style="margin: 0 auto;"></div>
+        <div style="color: var(--ios-text-muted); font-size: 0.85rem;">Mendeteksi lokasi GPS...</div>
+      </div>
     </div>
   </div>
   <div class="offcanvas-body" style="background-color: var(--ios-bg-primary);">
@@ -852,15 +857,17 @@ function stopAudio() {
   }
 }
 
-function showToast(msg) {
+function showToast(msg, type = 'success') {
   let toast = document.getElementById('iosToast');
   if(!toast) {
     toast = document.createElement('div'); toast.id = 'iosToast'; toast.className = 'ios-toast';
     document.body.appendChild(toast);
   }
-  toast.innerHTML = `<i class="bi bi-check-circle-fill me-2" style="color: var(--ios-green);"></i> ${msg}`;
+  const icon = type === 'warning' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill';
+  const color = type === 'warning' ? 'var(--ios-warning)' : 'var(--ios-green)';
+  toast.innerHTML = `<i class="bi ${icon} me-2" style="color: ${color};"></i> ${msg}`;
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 function saveBookmark(surahNum, surahName, ayahNum, teksArab, teksLatin, teksIndo) {
@@ -1010,65 +1017,122 @@ function testAzanVolume() {
 // ================================================================
 // GPS AUTO-DETECT LOCATION (Native Bridge + Nominatim + Fuzzy Match)
 // ================================================================
+let cityListCache = null;
+
 async function autoDetectLocationFromGPS() {
-  if (typeof AndroidBridge === 'undefined' || !AndroidBridge.getGPSLocation) {
-    console.warn('AndroidBridge.getGPSLocation not available, skipping GPS auto-detect');
+  const loadingEl = document.getElementById('gpsLoadingIndicator');
+  if (loadingEl) loadingEl.style.display = 'flex';
+  
+  // Try native bridge first (newer APK)
+  let gpsCoords = null;
+  if (typeof AndroidBridge !== 'undefined' && AndroidBridge.getGPSLocation) {
+    try {
+      const gpsResult = AndroidBridge.getGPSLocation();
+      if (gpsResult) {
+        const [lat, lng] = gpsResult.split(',').map(Number);
+        if (lat && lng) gpsCoords = { lat, lng };
+      }
+    } catch (e) {
+      console.warn('Native GPS bridge failed:', e);
+    }
+  }
+  
+  // Fallback to browser geolocation (works on all APK versions)
+  if (!gpsCoords && navigator.geolocation) {
+    try {
+      gpsCoords = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          err => reject(err),
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      });
+    } catch (e) {
+      console.warn('Browser geolocation failed:', e);
+    }
+  }
+  
+  if (!gpsCoords) {
+    if (loadingEl) loadingEl.style.display = 'none';
+    showToast('GPS tidak tersedia. Pilih lokasi manual.', 'warning');
     return;
   }
   
   try {
-    showLoading(true);
-    const gpsResult = AndroidBridge.getGPSLocation();
-    if (!gpsResult) throw new Error('No GPS location');
-    
-    const [lat, lng] = gpsResult.split(',').map(Number);
-    if (!lat || !lng) throw new Error('Invalid GPS coords');
-    
     // Reverse geocode via Nominatim
-    const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`);
+    const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${gpsCoords.lat}&lon=${gpsCoords.lng}&zoom=10&addressdetails=1`);
     const geoData = await geoRes.json();
     
     if (!geoData.address) throw new Error('No address data');
     
-    // Extract city/kabupaten
+    // Extract city/kabupaten - handle various Nominatim fields
     const city = geoData.address.city || geoData.address.town || geoData.address.village || 
-                 geoData.address.county || geoData.address.state_district || '';
+                 geoData.address.county || geoData.address.state_district || 
+                 geoData.address.municipality || geoData.address.suburb || '';
     
-    // Fuzzy match against myquran API city list
-    const cityRes = await fetch(`${API_V3_MYQURAN}/kota/semua`);
-    const cityData = await cityRes.json();
-    const cities = cityData.data || [];
+    if (!city) throw new Error('No city found in address');
     
+    // Load city list (with cache)
+    if (!cityListCache) {
+      const cityRes = await fetch(`${API_V3_MYQURAN}/kota/semua`);
+      const cityData = await cityRes.json();
+      cityListCache = cityData.data || [];
+    }
+    
+    const cities = cityListCache;
+    const target = city.toLowerCase().replace(/^(kab\.?|kota|kabupaten)\.?\s*/i, '');
+    
+    // Improved fuzzy matching with multiple strategies
     let bestMatch = null;
     let bestScore = 0;
     
     for (const c of cities) {
-      const name = c.lokasi.toLowerCase();
-      const target = city.toLowerCase();
-      // Simple fuzzy: check if target contains city name or vice versa
+      const name = c.lokasi.toLowerCase().replace(/^(kab\.?|kota|kabupaten)\.?\s*/i, '');
+      
+      // Strategy 1: Exact match after prefix removal
+      if (name === target) {
+        bestMatch = c; bestScore = 1; break;
+      }
+      
+      // Strategy 2: Contains match
       if (name.includes(target) || target.includes(name)) {
         const score = Math.min(name.length, target.length) / Math.max(name.length, target.length);
-        if (score > bestScore) {
-          bestScore = score;
-          bestMatch = c;
-        }
+        if (score > bestScore) { bestScore = score; bestMatch = c; }
+      }
+      
+      // Strategy 3: Word overlap
+      const targetWords = target.split(/\s+/);
+      const nameWords = name.split(/\s+/);
+      const overlap = targetWords.filter(w => nameWords.includes(w)).length;
+      if (overlap > 0) {
+        const score = overlap / Math.max(targetWords.length, nameWords.length) * 0.8;
+        if (score > bestScore) { bestScore = score; bestMatch = c; }
       }
     }
     
-    if (bestMatch) {
+    if (bestMatch && bestScore > 0.3) {
       localStorage.setItem('kotaId', bestMatch.id);
       localStorage.setItem('selectedLocation', bestMatch.lokasi);
       localStorage.setItem('hasAutoDetectedLocation', 'true');
       document.getElementById('currentLocationName').textContent = bestMatch.lokasi;
-      showLoading(false);
-      // Re-init jadwal with new location
+      
+      if (typeof showToast === 'function') {
+        showToast(`Lokasi otomatis: ${bestMatch.lokasi}`, 'success');
+      }
+      
       await initJadwalSholat();
-    } else {
-      throw new Error('No city match');
+      return;
     }
+    
+    throw new Error('No city match (score too low)');
   } catch (e) {
-    console.warn('GPS auto-detect failed:', e);
-    showLoading(false);
+    console.warn('Auto-detect failed:', e);
+    if (typeof showToast === 'function') {
+      showToast('Deteksi otomatis gagal. Pilih manual.', 'warning');
+    }
+  } finally {
+    const loadingEl = document.getElementById('gpsLoadingIndicator');
+    if (loadingEl) loadingEl.style.display = 'none';
   }
 }
 
