@@ -125,6 +125,16 @@
   <script src="core.js"></script>
 
   <script>
+    // Init theme and color immediately from localStorage
+    (function initTasbihThemeAndColor() {
+      const isDark = localStorage.getItem('isDarkMode') === 'true';
+      if (isDark) document.body.classList.add("night");
+      else document.body.classList.remove("night");
+
+      const savedColor = localStorage.getItem('appAccentColor') || '#FF9F0A';
+      document.documentElement.style.setProperty('--accent-color', savedColor);
+    })();
+
     window.addEventListener('message', function(event) {
       const data = event.data;
       if (data.type === 'SYNC_THEME') {
@@ -137,6 +147,15 @@
       }
       if (data.type === 'INCREMENT_COUNT') {
         if (typeof incrementCount === "function") incrementCount();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', function() {
+      const savedColor = localStorage.getItem('appAccentColor') || '#FF9F0A';
+      document.documentElement.style.setProperty('--accent-color', savedColor);
+      if (typeof updateDisplay === "function") updateDisplay();
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'REQUEST_SYNC' }, '*');
       }
     });
 
