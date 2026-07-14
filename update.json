@@ -1,11 +1,13 @@
 {
   "created_by": "Sahal Arbani",
-  "version": "11.2.4",
-  "apk_version": 14,
-  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/v11.2.4/Alquran_v11.2.4_final_signed.apk",
-  "tanggal_update": "13 Juli 2026",
+  "version": "11.2.5",
+  "apk_version": 15,
+  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/v11.2.5/Alquran_v11.2.5_final_signed.apk",
+  "tanggal_update": "14 Juli 2026",
   "fitur_baru": [
-    "Versi APK naik ke v11.2.4 (build 14)",
+    "Versi APK naik ke v11.2.5 (build 15)",
+    "Volume Azan Minimal 20% (tidak akan mute / terlalu kecil lagi)",
+    "Hapus override system alarm volume dari slider web (mandiri)",
     "Package Name: com.alquran.pro (SAME AS OLD - update seamless)",
     "GPS Auto-Detect Lokasi via AndroidBridge + Nominatim Reverse Geocode",
     "Fuzzy Match 518 kota API myquran (handle KAB./KOTA prefix)",
@@ -18,34 +20,20 @@
     "Single Permission Dialog (Notifikasi + Lokasi sekaligus)",
     "Color Accent Default #FF9F0A (Orange/Amber) + Color Picker Adjustable",
     "Tasbih Color Sync Real-time via postMessage (hex format)",
-    "Service Worker Cache v31 (force refresh UI baru)",
+    "Service Worker Cache v35 (force refresh UI baru)",
     "Immersive Edge-to-Edge + Safe Area Inset 5px (notch aman)",
     "WebView Native Feel: no zoom, no scrollbar, no tap highlight, no context menu",
-    "Vibrasi Tasbih via tombol Volume fisik (native bridge)",
-    "Volume Azan Control: Minimal 10% - Maksimal 100%, Slider UI, Test Button, Native Sync",
-    "Smart Update: Deduplikasi download, auto-delete setelah install, cleanup state"
+    "Vibrasi Tasbih via tombol Volume fisik (native bridge)"
   ],
   "petunjuk": [
     "Package Name SAMA dengan versi lama (com.alquran.pro) → update seamless tanpa uninstall.",
     "Izin Notifikasi + Lokasi diminta SAAT PERTAMA BUKA APP (1 dialog). Klik 'Izinkan' keduanya.",
     "GPS Auto-Detect jalan otomatis saat pertama buka. Kalau gagal → klik 'Gunakan GPS Sekarang' di Sheet Lokasi.",
     "Azan Offline: file MP3 sudah di dalam APK (2.9MB + 1.8MB). Bunyi tetap nyala walau mode pesawat.",
-    "Update Otomatis: App cek update.json tiap 6 jam di background. Notif muncul di status bar tanpa buka app.",
-    "Warna Aksen: Default Orange (#FF9F0A). Bisa ganti di Pengaturan → seluruh halaman (Tasbih, Kalender, Jadwal) ikut berubah real-time.",
-    "Tasbih: Pakai tombol Volume Fisik (+/-) untuk increment/reset counter tanpa sentuh layar.",
-    "Volume Azan: Minimal 10% (tidak bisa mute), maksimal 100%. Default 10%. Bisa diatur di Pengaturan.",
-    "Jika download native stuck >5 detik → tombol 'Download via Browser (Fallback)' muncul otomatis."
+    "Update Otomatis: App cek update.json tiap 6 jam di background. Notif muncul di status bar tanpa buka app."
   ],
   "bug": [
-    "Fix: Permission dialog dobel (notif + lokasi) → sekarang 1 dialog gabungan.",
-    "Fix: GPS delay & stale location → pakai getLastKnownLocation + fallback navigator.geolocation.",
-    "Fix: Tasbih color async → sekarang sync instant pakai hex (bukan HSL).",
-    "Fix: Azan not repeat harian → auto-reschedule di onReceive + BootReceiver.",
-    "Fix: Update notif cuma di WebView → sekarang native WorkManager (bisa kill app).",
-    "Fix: Service worker cache stale → bump ke v31 force refresh.",
-    "Fix: Silent drop download Android 14 → pakai WorkManager + foreground notification.",
-    "Fix: Install APK intent → FileProvider + FLAG_GRANT_READ_URI_PERMISSION.",
-    "Fix: Immersive mode crash → dipindah setelah setContentView().",
-    "Fix: Safe area notch → CSS env(safe-area-inset-top) + 5px native padding."
+    "Fix: Volume minimal sekarang di-clamp 20% di level native.",
+    "Fix: Hapus pemaksaan sync ke stream alarm hardware OS yang bikin conflict."
   ]
 }

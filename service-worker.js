@@ -1,5 +1,5 @@
 // Ganti versi ini SETIAP KALI lu nge-push perubahan besar ke GitHub!
-const CACHE_NAME = 'alquran-cache-v34';
+const CACHE_NAME = 'alquran-cache-v35';
 
 // 1. PRE-CACHE: Daftarkan file statis UI, KECUALI mesin OTA Update
 const urlsToCache = [
