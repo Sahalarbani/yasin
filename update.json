@@ -1,23 +1,22 @@
 {
   "created_by": "Sahal Arbani",
-  "version": "11.2.8",
-  "apk_version": 18,
-  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/v11.2.8/Alquran_v11.2.8_final_signed.apk",
+  "version": "11.2.9",
+  "apk_version": 19,
+  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/v11.2.9/Alquran_v11.2.9_final_signed.apk",
   "tanggal_update": "14 Juli 2026",
   "fitur_baru": [
-    "Versi APK naik ke v11.2.8 (build 18)",
+    "Versi APK naik ke v11.2.9 (build 19)",
+    "Perbaikan Offline Mode: Aplikasi sekarang tidak memblokir diri saat dibuka tanpa internet, memberi kesempatan Service Worker PWA memuat halaman dari cache secara normal",
     "Pembersihan File Otomatis: File APK update lama di storage langsung dihapus agar tidak menumpuk",
     "Notifikasi Update PERSISTENT + tombol PASANG SEKARANG langsung di panel notifikasi",
     "Sinkronisasi Real-Time: Slider Volume Azan di web gerak otomatis saat tombol volume fisik HP digeser",
-    "Pembersihan UI Web: Hapus baris Volume HP ganda dan tombol Sync manual yang tidak diperlukan",
     "Volume Azan Minimal 20% - Maksimal 100% (mandiri tanpa override sistem)"
   ],
   "petunjuk": [
     "Package Name SAMA dengan versi lama (com.alquran.pro) → update seamless tanpa uninstall.",
-    "File APK update lama otomatis dibersihkan oleh sistem begitu versi baru selesai diunduh."
+    "Buka aplikasi tanpa internet tetap akan memuat halaman terakhir dan fitur offline yang sudah tersimpan di cache."
   ],
   "bug": [
-    "Fix: Storage HP menumpuk karena file APK lama tidak terhapus.",
-    "Fix: Notifikasi install sekarang persistent & punya tombol aksi PASANG SEKARANG."
+    "Fix: Aplikasi langsung memunculkan layar error saat dibuka offline walau cache tersedia."
   ]
 }
