@@ -1,11 +1,13 @@
 {
   "created_by": "Sahal Arbani",
-  "version": "11.2.5",
-  "apk_version": 15,
-  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/v11.2.5/Alquran_v11.2.5_final_signed.apk",
+  "version": "11.2.6",
+  "apk_version": 16,
+  "apk_url": "https://github.com/Sahalarbani/yasin/releases/download/v11.2.5/Alquran_v11.2.6_final_signed.apk",
   "tanggal_update": "14 Juli 2026",
   "fitur_baru": [
-    "Versi APK naik ke v11.2.5 (build 15)",
+    "Versi APK naik ke v11.2.6 (build 16)",
+    "Notifikasi Update PERSISTENT + tombol PASANG SEKARANG langsung di panel notifikasi",
+    "Buka ulang aplikasi saat file update sudah siap otomatis menampilkan tombol Pasang di notifikasi",
     "Volume Azan Minimal 20% (tidak akan mute / terlalu kecil lagi)",
     "Hapus override system alarm volume dari slider web (mandiri)",
     "Package Name: com.alquran.pro (SAME AS OLD - update seamless)",
@@ -20,7 +22,7 @@
     "Single Permission Dialog (Notifikasi + Lokasi sekaligus)",
     "Color Accent Default #FF9F0A (Orange/Amber) + Color Picker Adjustable",
     "Tasbih Color Sync Real-time via postMessage (hex format)",
-    "Service Worker Cache v35 (force refresh UI baru)",
+    "Service Worker Cache v36 (force refresh UI baru)",
     "Immersive Edge-to-Edge + Safe Area Inset 5px (notch aman)",
     "WebView Native Feel: no zoom, no scrollbar, no tap highlight, no context menu",
     "Vibrasi Tasbih via tombol Volume fisik (native bridge)"
@@ -33,6 +35,8 @@
     "Update Otomatis: App cek update.json tiap 6 jam di background. Notif muncul di status bar tanpa buka app."
   ],
   "bug": [
+    "Fix: Notifikasi install sekarang persistent & punya tombol aksi PASANG SEKARANG.",
+    "Fix: Klik Update Sekarang saat file sudah ada langsung memunculkan notifikasi pasang.",
     "Fix: Volume minimal sekarang di-clamp 20% di level native.",
     "Fix: Hapus pemaksaan sync ke stream alarm hardware OS yang bikin conflict."
   ]
