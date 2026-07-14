@@ -544,26 +544,17 @@
       <div class="ios-list-item d-flex justify-content-between align-items-center">
         <div>
           <span class="fw-bold d-block">Volume Azan</span>
-          <span style="font-size: 0.75rem; color: var(--ios-text-muted);">Minimal 10% - Maksimal 100%</span>
+          <span style="font-size: 0.75rem; color: var(--ios-text-muted);">Minimal 20% - Maksimal 100%</span>
         </div>
-        <span id="azanVolumeValue" style="font-size: 0.85rem; color: var(--ios-blue); font-weight: 600;">10%</span>
+        <span id="azanVolumeValue" style="font-size: 0.85rem; color: var(--ios-blue); font-weight: 600;">20%</span>
       </div>
       <div class="ios-list-item" style="padding: 12px 16px;">
-        <input type="range" id="azanVolumeSlider" min="10" max="100" step="5" value="10" 
+        <input type="range" id="azanVolumeSlider" min="20" max="100" step="5" value="20" 
                style="width: 100%; accent-color: var(--ios-blue);">
-      </div>
-      <div class="ios-list-item d-flex justify-content-between align-items-center" style="padding: 12px 16px;">
-        <span style="font-size: 0.8rem; color: var(--ios-text-muted);">Volume HP (Alarm)</span>
-        <span id="systemAzanVolumeValue" style="font-size: 0.85rem; color: var(--ios-blue); font-weight: 600;">--%</span>
       </div>
       <div class="ios-list-item" style="padding: 12px 16px;">
         <button class="ios-btn-text w-100 py-2 fw-bold" style="background-color: var(--ios-blue); color: white; border-radius: 10px;" onclick="testAzanVolume()">
           <i class="bi bi-play-fill me-2"></i> Test Volume Azan
-        </button>
-      </div>
-      <div class="ios-list-item" style="padding: 12px 16px;">
-        <button class="ios-btn-text w-100 py-2 fw-bold" style="background-color: var(--ios-green); color: white; border-radius: 10px;" onclick="syncAzanVolumeWithSystem()">
-          <i class="bi bi-arrow-repeat me-2"></i> Sync dengan Volume HP (Tombol Fisik)
         </button>
       </div>
     </div>
@@ -990,27 +981,16 @@ function initAzanVolume() {
   
   const slider = document.getElementById('azanVolumeSlider');
   const valueDisplay = document.getElementById('azanVolumeValue');
-  const systemValueDisplay = document.getElementById('systemAzanVolumeValue');
   if (!slider || !valueDisplay) return;
   
-  // Get saved volume from native (synchronous)
   try {
     const vol = AndroidBridge.getAzanVolume();
-    const percent = Math.round(vol * 100);
+    const percent = Math.max(20, Math.round(vol * 100));
     slider.value = percent;
     valueDisplay.textContent = percent + '%';
   } catch (e) {
-    slider.value = 10;
-    valueDisplay.textContent = '10%';
-  }
-  
-  // Get system alarm volume
-  try {
-    const sysVol = AndroidBridge.getSystemAzanVolumePercent();
-    const sysPercent = Math.round(sysVol * 100);
-    if (systemValueDisplay) systemValueDisplay.textContent = sysPercent + '%';
-  } catch (e) {
-    if (systemValueDisplay) systemValueDisplay.textContent = '--%';
+    slider.value = 20;
+    valueDisplay.textContent = '20%';
   }
   
   slider.addEventListener('input', (e) => {
@@ -1021,15 +1001,6 @@ function initAzanVolume() {
   slider.addEventListener('change', (e) => {
     const vol = parseInt(e.target.value) / 100;
     AndroidBridge.setAzanVolume(vol);
-    
-    // Update system volume display after change
-    setTimeout(() => {
-      try {
-        const sysVol = AndroidBridge.getSystemAzanVolumePercent();
-        const sysPercent = Math.round(sysVol * 100);
-        if (systemValueDisplay) systemValueDisplay.textContent = sysPercent + '%';
-      } catch (e) {}
-    }, 300);
   });
 }
 
